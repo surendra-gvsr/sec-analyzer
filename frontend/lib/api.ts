@@ -18,37 +18,55 @@ function withTimeout(ms: number): AbortSignal {
   return AbortSignal.timeout(ms);
 }
 
+function humanizeError(e: unknown): Error {
+  if (e instanceof DOMException && e.name === 'TimeoutError') {
+    return new Error('Backend is starting up — please try again in a moment.');
+  }
+  if (e instanceof TypeError && e.message.includes('fetch')) {
+    return new Error('Cannot reach the backend — check your connection.');
+  }
+  return e instanceof Error ? e : new Error('Unknown error');
+}
+
 async function post<T>(
   path: string,
   body: unknown,
   timeoutMs = DEFAULT_TIMEOUT_MS
 ): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal: withTimeout(timeoutMs),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`${res.status}: ${text}`);
+  try {
+    const res = await fetch(`${BASE}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: withTimeout(timeoutMs),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`${res.status}: ${text}`);
+    }
+    return res.json() as Promise<T>;
+  } catch (e) {
+    throw humanizeError(e);
   }
-  return res.json() as Promise<T>;
 }
 
 async function get<T>(
   path: string,
   timeoutMs = DEFAULT_TIMEOUT_MS
 ): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    cache: 'no-store',
-    signal: withTimeout(timeoutMs),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`${res.status}: ${text}`);
+  try {
+    const res = await fetch(`${BASE}${path}`, {
+      cache: 'no-store',
+      signal: withTimeout(timeoutMs),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`${res.status}: ${text}`);
+    }
+    return res.json() as Promise<T>;
+  } catch (e) {
+    throw humanizeError(e);
   }
-  return res.json() as Promise<T>;
 }
 
 export const api = {
