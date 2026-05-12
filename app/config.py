@@ -18,10 +18,12 @@ class Settings(BaseSettings):
     target_tickers: str = "AAPL,MSFT"
     target_years: str = "2021,2022,2023,2024"
 
+    pinecone_api_key: str = ""
+    pinecone_index_name: str = "sec-filings"
+
     raw_filings_dir: str = "data/raw_filings"
     parsed_markdown_dir: str = "data/parsed_markdown"
     graph_store_dir: str = "data/graph_store"
-    chroma_db_dir: str = "data/chroma_db"
 
     environment: str = "development"
     log_level: str = "INFO"

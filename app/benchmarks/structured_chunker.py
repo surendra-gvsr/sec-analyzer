@@ -150,16 +150,16 @@ def build_structured_index(
     force: bool = False,
 ) -> int:
     """
-    Build the structure-aware ChromaDB index ("structured_chunks" collection).
+    Build the structure-aware Pinecone index (namespace "structured").
     Each chunk is prepended with a "Company: X | Year: Y | Document: 10-K" header
     so embeddings always carry global filing context, even for table fragments.
     Returns total chunks indexed.
     """
     try:
-        import chromadb
+        from pinecone import Pinecone, ServerlessSpec
         from llama_index.core import Document, VectorStoreIndex, StorageContext, Settings as LISettings
         from llama_index.embeddings.fastembed import FastEmbedEmbedding
-        from llama_index.vector_stores.chroma import ChromaVectorStore
+        from llama_index.vector_stores.pinecone import PineconeVectorStore
     except ImportError as e:
         raise RuntimeError(f"Missing dependency: {e}")
 
@@ -173,16 +173,21 @@ def build_structured_index(
     LISettings.llm = llm
     LISettings.embed_model = embed_model
 
-    chroma_client = chromadb.PersistentClient(path=settings.chroma_db_dir)
+    pc = Pinecone(api_key=settings.pinecone_api_key)
+    _ensure_pinecone_index(pc, settings.pinecone_index_name)
+    pinecone_index = pc.Index(settings.pinecone_index_name)
 
     if force:
         try:
-            chroma_client.delete_collection("structured_chunks")
+            pinecone_index.delete(delete_all=True, namespace="structured")
         except Exception:
             pass
 
-    collection = chroma_client.get_or_create_collection("structured_chunks")
-    vector_store = ChromaVectorStore(chroma_collection=collection)
+    vector_store = PineconeVectorStore(
+        pinecone_index=pinecone_index,
+        namespace="structured",
+        text_key="text",
+    )
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
     documents: List[Document] = []
@@ -287,6 +292,53 @@ def _emit_table_documents(markdown: str, ticker: str, year: int) -> List:
     return docs
 
 
+def _ensure_pinecone_index(pc, index_name: str) -> None:
+    """Create the Pinecone serverless index if it doesn't exist yet."""
+    from pinecone import ServerlessSpec
+    existing = {idx.name for idx in pc.list_indexes()}
+    if index_name not in existing:
+        pc.create_index(
+            name=index_name,
+            dimension=384,
+            metric="cosine",
+            spec=ServerlessSpec(cloud="aws", region="us-east-1"),
+        )
+        log.info("Created Pinecone index '%s'.", index_name)
+
+
+_INTERNAL_METADATA_KEYS = frozenset({"_node_content", "_node_type", "document_id", "ref_doc_id"})
+
+
+def _fetch_all_nodes_from_pinecone(pinecone_index, namespace: str) -> List:
+    """Fetch every stored node from Pinecone to reconstruct the BM25 index."""
+    from llama_index.core.schema import TextNode
+    try:
+        all_ids: List[str] = []
+        for page in pinecone_index.list(namespace=namespace):
+            all_ids.extend(page)
+        if not all_ids:
+            log.warning("No vectors in Pinecone namespace '%s' — index may not be built yet.", namespace)
+            return []
+        log.info("Fetching %d nodes from Pinecone for BM25 reconstruction…", len(all_ids))
+        nodes: List[TextNode] = []
+        for i in range(0, len(all_ids), 100):
+            batch = all_ids[i:i + 100]
+            result = pinecone_index.fetch(ids=batch, namespace=namespace)
+            for vec in result.vectors.values():
+                text = vec.metadata.get("text", "")
+                metadata = {
+                    k: v for k, v in vec.metadata.items()
+                    if k not in _INTERNAL_METADATA_KEYS and k != "text"
+                }
+                if text:
+                    nodes.append(TextNode(text=text, metadata=metadata))
+        log.info("Loaded %d nodes for BM25.", len(nodes))
+        return nodes
+    except Exception as exc:
+        log.error("Failed to fetch nodes from Pinecone: %s", exc)
+        return []
+
+
 # ─── Module-level cache for the production retriever ─────────────────────────
 # Building the BM25 index from all nodes is expensive — we cache it per-process
 # so the 10-question benchmark doesn't rebuild it 10 times.
@@ -306,12 +358,11 @@ def _get_production_components(rerank_top_n: int = 5):
         return _PROD_RETRIEVER_CACHE["components"]
 
     try:
-        import chromadb
+        from pinecone import Pinecone
         from llama_index.core import VectorStoreIndex, StorageContext, Settings as LISettings
         from llama_index.core.query_engine import RetrieverQueryEngine
-        from llama_index.core.schema import TextNode
         from llama_index.embeddings.fastembed import FastEmbedEmbedding
-        from llama_index.vector_stores.chroma import ChromaVectorStore
+        from llama_index.vector_stores.pinecone import PineconeVectorStore
     except ImportError as e:
         raise RuntimeError(f"Missing dependency: {e}")
 
@@ -327,21 +378,19 @@ def _get_production_components(rerank_top_n: int = 5):
     LISettings.llm = llm
     LISettings.embed_model = embed_model
 
-    chroma_client = chromadb.PersistentClient(path=settings.chroma_db_dir)
-    collection = chroma_client.get_or_create_collection("structured_chunks")
-    vector_store = ChromaVectorStore(chroma_collection=collection)
+    pc = Pinecone(api_key=settings.pinecone_api_key)
+    pinecone_index = pc.Index(settings.pinecone_index_name)
+    vector_store = PineconeVectorStore(
+        pinecone_index=pinecone_index,
+        namespace="structured",
+        text_key="text",
+    )
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
     vector_index = VectorStoreIndex.from_vector_store(
         vector_store, storage_context=storage_context
     )
 
-    log.info("Loading nodes from ChromaDB for BM25 index…")
-    raw = collection.get(include=["documents", "metadatas"])
-    nodes = [
-        TextNode(text=doc, metadata=meta or {})
-        for doc, meta in zip(raw["documents"], raw["metadatas"])
-    ]
-    log.info("Loaded %d nodes for BM25.", len(nodes))
+    nodes = _fetch_all_nodes_from_pinecone(pinecone_index, namespace="structured")
 
     # Phase 2 tuning: cast a wider net (top-40), let reranker pick top-10
     hybrid_retriever = build_hybrid_retriever(

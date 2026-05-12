@@ -37,15 +37,14 @@ def build_naive_index(
     force: bool = False,
 ) -> int:
     """
-    Build the naive ChromaDB index ("naive_chunks" collection).
+    Build the naive Pinecone index (namespace "naive").
     Returns the total number of chunks indexed.
     """
     try:
-        import chromadb
+        from pinecone import Pinecone, ServerlessSpec
         from llama_index.core import Document, VectorStoreIndex, StorageContext, Settings as LISettings
         from llama_index.embeddings.fastembed import FastEmbedEmbedding
-        from llama_index.vector_stores.chroma import ChromaVectorStore
-        from llama_index.llms.groq import Groq
+        from llama_index.vector_stores.pinecone import PineconeVectorStore
     except ImportError as e:
         raise RuntimeError(f"Missing dependency: {e}")
 
@@ -58,16 +57,28 @@ def build_naive_index(
     LISettings.llm = llm
     LISettings.embed_model = embed_model
 
-    chroma_client = chromadb.PersistentClient(path=settings.chroma_db_dir)
+    pc = Pinecone(api_key=settings.pinecone_api_key)
+    existing = {idx.name for idx in pc.list_indexes()}
+    if settings.pinecone_index_name not in existing:
+        pc.create_index(
+            name=settings.pinecone_index_name,
+            dimension=384,
+            metric="cosine",
+            spec=ServerlessSpec(cloud="aws", region="us-east-1"),
+        )
+    pinecone_index = pc.Index(settings.pinecone_index_name)
 
     if force:
         try:
-            chroma_client.delete_collection("naive_chunks")
+            pinecone_index.delete(delete_all=True, namespace="naive")
         except Exception:
             pass
 
-    collection = chroma_client.get_or_create_collection("naive_chunks")
-    vector_store = ChromaVectorStore(chroma_collection=collection)
+    vector_store = PineconeVectorStore(
+        pinecone_index=pinecone_index,
+        namespace="naive",
+        text_key="text",
+    )
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
     documents: List[Document] = []
@@ -105,11 +116,10 @@ def query_naive(question: str, top_k: int = 5) -> Tuple[str, List[Dict]]:
     Used by the benchmark evaluator — not the main API path.
     """
     try:
-        import chromadb
+        from pinecone import Pinecone
         from llama_index.core import VectorStoreIndex, StorageContext, Settings as LISettings
         from llama_index.embeddings.fastembed import FastEmbedEmbedding
-        from llama_index.llms.groq import Groq
-        from llama_index.vector_stores.chroma import ChromaVectorStore
+        from llama_index.vector_stores.pinecone import PineconeVectorStore
     except ImportError as e:
         raise RuntimeError(f"Missing dependency: {e}")
 
@@ -119,9 +129,13 @@ def query_naive(question: str, top_k: int = 5) -> Tuple[str, List[Dict]]:
     LISettings.llm = llm
     LISettings.embed_model = embed_model
 
-    chroma_client = chromadb.PersistentClient(path=settings.chroma_db_dir)
-    collection = chroma_client.get_or_create_collection("naive_chunks")
-    vector_store = ChromaVectorStore(chroma_collection=collection)
+    pc = Pinecone(api_key=settings.pinecone_api_key)
+    pinecone_index = pc.Index(settings.pinecone_index_name)
+    vector_store = PineconeVectorStore(
+        pinecone_index=pinecone_index,
+        namespace="naive",
+        text_key="text",
+    )
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
     index = VectorStoreIndex.from_vector_store(vector_store, storage_context=storage_context)
     engine = index.as_query_engine(similarity_top_k=top_k)

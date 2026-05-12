@@ -147,14 +147,28 @@ def trigger_parse(req: PipelineRequest, background_tasks: BackgroundTasks) -> Pi
 
 
 def _run_build_index(job_id: str, tickers, years, force):
-    _jobs[job_id] = {"stage": "indexing", "progress": 0, "message": "Building index…", "errors": []}
+    _jobs[job_id] = {"stage": "indexing", "progress": 10, "message": "Building structured index…", "errors": []}
     try:
-        graph_builder.build_index(tickers=tickers, years=years, force=force)
+        from app.benchmarks.structured_chunker import build_structured_index
+        from app.benchmarks.naive_chunker import build_naive_index
+
+        structured_count = build_structured_index(tickers=tickers, years=years, force=force)
+        _jobs[job_id]["progress"] = 60
+        _jobs[job_id]["message"] = (
+            f"Structured index done ({structured_count} chunks). Building naive index…"
+        )
+
+        naive_count = build_naive_index(tickers=tickers, years=years, force=force)
+        _jobs[job_id]["progress"] = 90
+        _jobs[job_id]["message"] = "Indexes uploaded to Pinecone. Initialising query engine…"
+
         query_engine.initialise(force=True)
-        stats = graph_builder.get_index_stats()
         _jobs[job_id] = {
             "stage": "done", "progress": 100,
-            "message": f"Index built. Nodes: {stats['nodes']}, Edges: {stats['edges']}",
+            "message": (
+                f"Index built — {structured_count} structured chunks, "
+                f"{naive_count} naive chunks uploaded to Pinecone."
+            ),
             "errors": [],
         }
     except Exception as exc:

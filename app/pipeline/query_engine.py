@@ -55,12 +55,12 @@ def initialise(force: bool = False) -> bool:
         return _initialise_structured_fallback()
 
     try:
+        from pinecone import Pinecone
         from llama_index.core import PropertyGraphIndex, StorageContext, Settings as LISettings
         from llama_index.core.graph_stores import SimplePropertyGraphStore
         from llama_index.llms.groq import Groq
         from llama_index.embeddings.fastembed import FastEmbedEmbedding
-        import chromadb
-        from llama_index.vector_stores.chroma import ChromaVectorStore
+        from llama_index.vector_stores.pinecone import PineconeVectorStore
     except ImportError as e:
         log.error("Missing dependency: %s", e)
         return False
@@ -73,9 +73,13 @@ def initialise(force: bool = False) -> bool:
     LISettings.embed_model = embed_model
 
     graph_store = SimplePropertyGraphStore.from_persist_path(str(graph_path))
-    chroma_client = chromadb.PersistentClient(path=settings.chroma_db_dir)
-    chroma_collection = chroma_client.get_or_create_collection("sec_filings")
-    vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
+    pc = Pinecone(api_key=settings.pinecone_api_key)
+    pinecone_index = pc.Index(settings.pinecone_index_name)
+    vector_store = PineconeVectorStore(
+        pinecone_index=pinecone_index,
+        namespace="graph",
+        text_key="text",
+    )
     storage_context = StorageContext.from_defaults(
         graph_store=graph_store,
         vector_store=vector_store,
@@ -96,34 +100,49 @@ def is_ready() -> bool:
 
 
 def _initialise_structured_fallback() -> bool:
-    """Use the structured-chunk ChromaDB index when no graph exists."""
+    """Use the Pinecone structured-chunk index when no graph store exists."""
     global _query_engine, _index, _is_ready
 
-    # Import ONLY chromadb first — it's ~80MB. All other heavy imports
-    # (llama_index ~200MB, fastembed ~150MB) are deferred until after we
-    # confirm the collection exists. On a fresh Render deploy (no data),
-    # failing early keeps peak RSS under 350MB vs 600MB+, preventing OOM
-    # kills on the 512MB free tier before uvicorn can bind to its port.
+    # Import only pinecone first (lightweight) to check if vectors exist.
+    # Heavy deps (llama_index, fastembed) are deferred until after we confirm
+    # the index has data — keeps cold-start RSS low on Render's 512MB free tier.
     try:
-        import chromadb
+        from pinecone import Pinecone
     except ImportError as e:
-        log.error("Missing chromadb: %s", e)
+        log.error("Missing pinecone: %s", e)
         return False
 
-    chroma_client = chromadb.PersistentClient(path=settings.chroma_db_dir)
     try:
-        collection = chroma_client.get_collection("structured_chunks")
-    except Exception:
-        log.warning("structured_chunks collection not found — run build_index.py --naive-only")
+        pc = Pinecone(api_key=settings.pinecone_api_key)
+        index_names = {idx.name for idx in pc.list_indexes()}
+        if settings.pinecone_index_name not in index_names:
+            log.warning(
+                "Pinecone index '%s' not found — run Build Index from the Pipeline tab.",
+                settings.pinecone_index_name,
+            )
+            _is_ready = False
+            return False
+
+        pinecone_index = pc.Index(settings.pinecone_index_name)
+        stats = pinecone_index.describe_index_stats()
+        ns = stats.namespaces.get("structured")
+        if ns is None or ns.vector_count == 0:
+            log.warning(
+                "Pinecone 'structured' namespace is empty — run Build Index from the Pipeline tab."
+            )
+            _is_ready = False
+            return False
+    except Exception as exc:
+        log.warning("Pinecone readiness check failed: %s", exc)
         _is_ready = False
         return False
 
-    # Collection confirmed — now load the remaining heavy dependencies.
+    # Vectors confirmed — load heavy dependencies.
     try:
         from llama_index.core import VectorStoreIndex, StorageContext, Settings as LISettings
         from llama_index.embeddings.fastembed import FastEmbedEmbedding
         from llama_index.llms.groq import Groq
-        from llama_index.vector_stores.chroma import ChromaVectorStore
+        from llama_index.vector_stores.pinecone import PineconeVectorStore
     except ImportError as e:
         log.error("Missing dependency: %s", e)
         return False
@@ -133,12 +152,16 @@ def _initialise_structured_fallback() -> bool:
     LISettings.llm = llm
     LISettings.embed_model = embed_model
 
-    vector_store = ChromaVectorStore(chroma_collection=collection)
+    vector_store = PineconeVectorStore(
+        pinecone_index=pinecone_index,
+        namespace="structured",
+        text_key="text",
+    )
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
     _index = VectorStoreIndex.from_vector_store(vector_store, storage_context=storage_context)
     _query_engine = _index.as_query_engine(similarity_top_k=5)
     _is_ready = True
-    log.info("Query engine ready (structured-chunk fallback mode).")
+    log.info("Query engine ready (Pinecone structured-chunk mode).")
     return True
 
 

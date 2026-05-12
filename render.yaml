@@ -25,3 +25,5 @@ services:
         sync: false
       - key: SEC_USER_EMAIL
         sync: false
+      - key: PINECONE_API_KEY
+        sync: false

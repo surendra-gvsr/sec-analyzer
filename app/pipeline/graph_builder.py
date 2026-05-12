@@ -68,13 +68,13 @@ def build_index(
         return
 
     try:
+        from pinecone import Pinecone, ServerlessSpec
         from llama_index.core import Document, PropertyGraphIndex, StorageContext, Settings as LISettings
         from llama_index.core.graph_stores import SimplePropertyGraphStore
         from llama_index.core.indices.property_graph import SimpleLLMPathExtractor
         from llama_index.llms.groq import Groq
         from llama_index.embeddings.fastembed import FastEmbedEmbedding
-        import chromadb
-        from llama_index.vector_stores.chroma import ChromaVectorStore
+        from llama_index.vector_stores.pinecone import PineconeVectorStore
     except ImportError as e:
         raise RuntimeError(f"Missing dependency: {e}. Run: pip install -r requirements.txt")
 
@@ -102,9 +102,26 @@ def build_index(
 
     # Storage
     graph_store = SimplePropertyGraphStore()
-    chroma_client = chromadb.PersistentClient(path=settings.chroma_db_dir)
-    chroma_collection = chroma_client.get_or_create_collection("sec_filings")
-    vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
+    pc = Pinecone(api_key=settings.pinecone_api_key)
+    existing = {idx.name for idx in pc.list_indexes()}
+    if settings.pinecone_index_name not in existing:
+        pc.create_index(
+            name=settings.pinecone_index_name,
+            dimension=384,
+            metric="cosine",
+            spec=ServerlessSpec(cloud="aws", region="us-east-1"),
+        )
+    pinecone_index = pc.Index(settings.pinecone_index_name)
+    if force:
+        try:
+            pinecone_index.delete(delete_all=True, namespace="graph")
+        except Exception:
+            pass
+    vector_store = PineconeVectorStore(
+        pinecone_index=pinecone_index,
+        namespace="graph",
+        text_key="text",
+    )
     storage_context = StorageContext.from_defaults(
         graph_store=graph_store,
         vector_store=vector_store,
