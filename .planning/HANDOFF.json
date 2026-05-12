@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-12T02:16:04.700Z",
+  "timestamp": "2026-05-12T15:27:39.531Z",
   "source": "auto-postool",
   "partial": false,
   "phase": null,
@@ -17,74 +17,14 @@
   "decisions": [],
   "uncommitted_files": [
     {
-      "status": "??",
-      "path": ".claude/"
+      "status": "M",
+      "path": ".planning/HANDOFF.json"
     },
     {
-      "status": "??",
-      "path": ".env.example"
-    },
-    {
-      "status": "??",
-      "path": ".gitignore"
-    },
-    {
-      "status": "??",
-      "path": ".husky/"
-    },
-    {
-      "status": "??",
-      "path": ".planning/"
-    },
-    {
-      "status": "??",
-      "path": ".prettierrc"
-    },
-    {
-      "status": "??",
-      "path": ".secretlintrc.json"
-    },
-    {
-      "status": "??",
-      "path": "CLAUDE.md"
-    },
-    {
-      "status": "??",
-      "path": "Procfile"
-    },
-    {
-      "status": "??",
-      "path": "app/"
-    },
-    {
-      "status": "??",
-      "path": "data/"
-    },
-    {
-      "status": "??",
-      "path": "docs/"
-    },
-    {
-      "status": "??",
-      "path": "frontend/"
-    },
-    {
-      "status": "??",
-      "path": "index.html"
-    },
-    {
-      "status": "??",
-      "path": "render.yaml"
-    },
-    {
-      "status": "??",
-      "path": "requirements.txt"
-    },
-    {
-      "status": "??",
-      "path": "scripts/"
+      "status": "M",
+      "path": "frontend/.gitignore"
     }
   ],
   "next_action": null,
-  "context_notes": ""
+  "context_notes": "Recent commits:\nf3e46bf feat: track frontend as regular directory (fix submodule)\n03bf4f0 feat: add Next.js 14 frontend + tooling setup"
 }
