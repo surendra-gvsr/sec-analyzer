@@ -5,30 +5,30 @@ import type {
   PipelineStatusResponse,
   QueryResponse,
   QueryMode,
-} from './types'
+} from './types';
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? ''
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 async function post<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-  })
+  });
   if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`${res.status}: ${text}`)
+    const text = await res.text();
+    throw new Error(`${res.status}: ${text}`);
   }
-  return res.json() as Promise<T>
+  return res.json() as Promise<T>;
 }
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, { cache: 'no-store' })
+  const res = await fetch(`${BASE}${path}`, { cache: 'no-store' });
   if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`${res.status}: ${text}`)
+    const text = await res.text();
+    throw new Error(`${res.status}: ${text}`);
   }
-  return res.json() as Promise<T>
+  return res.json() as Promise<T>;
 }
 
 export const api = {
@@ -41,11 +41,9 @@ export const api = {
   benchmarkResults: () =>
     get<BenchmarkResultResponse>('/api/benchmark/results'),
 
-  runBenchmark: () =>
-    post<PipelineStatusResponse>('/api/benchmark/run', {}),
+  runBenchmark: () => post<PipelineStatusResponse>('/api/benchmark/run', {}),
 
-  dataStatus: () =>
-    get<DataStatusResponse>('/api/pipeline/data-status'),
+  dataStatus: () => get<DataStatusResponse>('/api/pipeline/data-status'),
 
   download: (tickers?: string[], years?: number[]) =>
     post<PipelineStatusResponse>('/api/pipeline/download', { tickers, years }),
@@ -54,8 +52,11 @@ export const api = {
     post<PipelineStatusResponse>('/api/pipeline/parse', { tickers, years }),
 
   buildIndex: (tickers?: string[], years?: number[]) =>
-    post<PipelineStatusResponse>('/api/pipeline/build-index', { tickers, years }),
+    post<PipelineStatusResponse>('/api/pipeline/build-index', {
+      tickers,
+      years,
+    }),
 
   pollStatus: (jobId: string) =>
     get<PipelineStatusResponse>(`/api/pipeline/status/${jobId}`),
-}
+};

@@ -69,12 +69,12 @@ A parallel `naive_chunks` collection is built from the same Markdown using fixed
 
 This project deliberately maintains TWO query paths and benchmarks them against each other:
 
-| | Naive (Basic Mode) | Structured (Smart Mode) |
-|---|---|---|
-| Chunker | `app/benchmarks/naive_chunker.py` (fixed 512-token windows) | `app/benchmarks/structured_chunker.py` (table-aware + metadata headers + table-as-document) |
-| Retrieval | Vector top-5 | Vector + BM25 top-40 → RRF → flashrank top-10 |
-| Synthesis | Default LlamaIndex tree_summarize | Strict context-only prompt OR JSON-mode for numerics OR per-year decomposition for trends |
-| Throttle | Yes (`build_throttled_groq`) | Yes |
+|           | Naive (Basic Mode)                                          | Structured (Smart Mode)                                                                     |
+| --------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Chunker   | `app/benchmarks/naive_chunker.py` (fixed 512-token windows) | `app/benchmarks/structured_chunker.py` (table-aware + metadata headers + table-as-document) |
+| Retrieval | Vector top-5                                                | Vector + BM25 top-40 → RRF → flashrank top-10                                               |
+| Synthesis | Default LlamaIndex tree_summarize                           | Strict context-only prompt OR JSON-mode for numerics OR per-year decomposition for trends   |
+| Throttle  | Yes (`build_throttled_groq`)                                | Yes                                                                                         |
 
 Both are exercised by the benchmark (`benchmark_runner.py`) AND by the live `/api/query` endpoint (mode param).
 
@@ -92,6 +92,7 @@ All in `app/rag_utils.py`:
 8. `decompose_trend_question()` — regex-based multi-year decomposition (no LLM call)
 
 Plus three optimizations:
+
 - `should_skip_hyde()` — skip HyDE when question is already specific (saves a Groq call). Currently only skips for terse keyword-style queries (≤5 words, no `?`); a more aggressive "factual lookup" path was tried and reverted (it regressed segment-specific queries like q05).
 - `RESPONSE_CACHE` — in-memory question→answer cache, capped at 256 entries
 - `validate_value_in_context()` — JSON-mode numeric values must appear in retrieved chunks (kills hallucination)
@@ -108,6 +109,7 @@ And four extraction-reliability helpers added later:
 `_extract_number()` in `evaluator.py` had a regex bug where `\d{1,3}(?:[,\s]\d{3})*` matched `"219"` from `"21914"` (zero comma groups, partial match wins over the longer-matching `\d+` alternative). Fixed by changing `*` to `+` (require ≥1 comma group on the comma-formatted branch) so bare numbers fall through to `\d+`. **Don't loosen back to `*` without re-testing q01.**
 
 Other evaluator fixes worth knowing:
+
 - `_keyword_in_text()` — multi-word `table_keyword` like `"net sales"` now passes if all words are present, not just the exact phrase. Without this q03 sometimes failed when the chunk had the heading and the table row separately.
 - `_extract_number(expected_unit="percent")` — scans `(\d+(?:\.\d+)?)\s*%` first so q07 finds `43.3%` instead of grabbing a revenue dollar.
 - Error-string guard — strings starting with `"error"` short-circuit to `None` so `"Error code: 413"` doesn't get parsed as `413`.

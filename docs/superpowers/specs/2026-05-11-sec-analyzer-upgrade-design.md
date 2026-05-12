@@ -1,4 +1,5 @@
 # SEC Analyzer Upgrade — Design Spec
+
 **Date:** 2026-05-11  
 **Status:** Approved
 
@@ -26,10 +27,10 @@ Upgrade the SEC Filing Trend Analyzer from a single-file `index.html` frontend t
 
 ### Runtime split
 
-| Layer | Host | Notes |
-|---|---|---|
-| FastAPI backend | Render | All heavy deps (ChromaDB, fastembed, flashrank, Groq). No changes to Python code. |
-| Next.js frontend | Vercel | Calls `NEXT_PUBLIC_API_URL`. Rewrites `/api/*` → Render URL. |
+| Layer            | Host   | Notes                                                                             |
+| ---------------- | ------ | --------------------------------------------------------------------------------- |
+| FastAPI backend  | Render | All heavy deps (ChromaDB, fastembed, flashrank, Groq). No changes to Python code. |
+| Next.js frontend | Vercel | Calls `NEXT_PUBLIC_API_URL`. Rewrites `/api/*` → Render URL.                      |
 
 ### Repository layout
 
@@ -114,21 +115,22 @@ Orchestrator
 
 ### API contract (unchanged endpoints)
 
-| Method | Path | Used by |
-|---|---|---|
-| POST | `/api/query` | Ask tab — Smart/Basic/Compare modes |
-| POST | `/api/query/compare` | Compare mode |
-| GET | `/api/benchmark/results` | Benchmark tab |
-| GET | `/api/pipeline/data-status` | Pipeline tab |
-| POST | `/api/pipeline/download` | Pipeline tab |
-| POST | `/api/pipeline/parse` | Pipeline tab |
-| POST | `/api/pipeline/build-index` | Pipeline tab |
-| GET | `/api/pipeline/status/{job_id}` | Pipeline polling |
-| POST | `/api/benchmark/run` | Benchmark tab |
+| Method | Path                            | Used by                             |
+| ------ | ------------------------------- | ----------------------------------- |
+| POST   | `/api/query`                    | Ask tab — Smart/Basic/Compare modes |
+| POST   | `/api/query/compare`            | Compare mode                        |
+| GET    | `/api/benchmark/results`        | Benchmark tab                       |
+| GET    | `/api/pipeline/data-status`     | Pipeline tab                        |
+| POST   | `/api/pipeline/download`        | Pipeline tab                        |
+| POST   | `/api/pipeline/parse`           | Pipeline tab                        |
+| POST   | `/api/pipeline/build-index`     | Pipeline tab                        |
+| GET    | `/api/pipeline/status/{job_id}` | Pipeline polling                    |
+| POST   | `/api/benchmark/run`            | Benchmark tab                       |
 
 ### Tabs
 
 **Ask tab** (`/ask`)
+
 - `QueryInput` with mode selector (Smart / Basic / Compare pills)
 - Example question cards (pre-filled clickable prompts)
 - `LoadingStages` — animated 4-step progress (Retrieving → Reranking → Synthesizing → Done)
@@ -138,12 +140,14 @@ Orchestrator
 - `QueryHistory` — sidebar panel with last 20 queries, click to replay
 
 **Benchmark tab** (`/benchmark`)
+
 - `StatsGrid` — TRA / ACS / CYC stat cards (vs naive baseline)
 - `RadarChart` — TRA/ACS/CYC structured vs naive radar
 - `ConfidenceHeatmap` — per-question confidence grid
 - `BenchmarkTable` — 10-question detail table with pass/fail indicators
 
 **Pipeline tab** (`/pipeline`)
+
 - `DataStatusGrid` — per-ticker/year download/parse/index status dots
 - `PipelineTriggers` — download / parse / build-index / run-benchmark buttons with job polling
 
@@ -175,7 +179,10 @@ frontend/node_modules/
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/.next",
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://<RENDER_URL>/api/:path*" }
+    {
+      "source": "/api/:path*",
+      "destination": "https://<RENDER_URL>/api/:path*"
+    }
   ]
 }
 ```

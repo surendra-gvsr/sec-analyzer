@@ -32,8 +32,10 @@ The current code passes a `<Button>` as `render` but then places `<Menu classNam
 
 ```tsx
 // BROKEN — Menu icon is a child of SheetTrigger, not of the rendered Button
-<SheetTrigger render={<Button variant="ghost" size="icon" className="h-8 w-8" />}>
-  <Menu className="h-4 w-4" />   {/* discarded */}
+<SheetTrigger
+  render={<Button variant="ghost" size="icon" className="h-8 w-8" />}
+>
+  <Menu className="h-4 w-4" /> {/* discarded */}
 </SheetTrigger>
 ```
 
@@ -42,7 +44,12 @@ The current code passes a `<Button>` as `render` but then places `<Menu classNam
 ```tsx
 <SheetTrigger
   render={
-    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Open navigation">
+    <Button
+      variant="ghost"
+      size="icon"
+      className="h-8 w-8"
+      aria-label="Open navigation"
+    >
       <Menu className="h-4 w-4" />
     </Button>
   }
@@ -66,17 +73,26 @@ If the backend returns a job that stalls — for example, `progress` stays at 95
 **Fix:** Add a maximum iteration count (or a wall-clock deadline):
 
 ```ts
-const MAX_POLLS = 150  // 5 minutes at 2s interval
-let polls = 0
-while (current.progress < 100 && current.stage !== 'error' && polls < MAX_POLLS) {
-  await new Promise(r => setTimeout(r, 2000))
-  current = await api.pollStatus(current.job_id)
-  setStatus(current)
-  polls++
+const MAX_POLLS = 150; // 5 minutes at 2s interval
+let polls = 0;
+while (
+  current.progress < 100 &&
+  current.stage !== 'error' &&
+  polls < MAX_POLLS
+) {
+  await new Promise((r) => setTimeout(r, 2000));
+  current = await api.pollStatus(current.job_id);
+  setStatus(current);
+  polls++;
 }
 if (polls >= MAX_POLLS) {
-  setStatus({ job_id: current.job_id, stage: 'error', progress: current.progress,
-               message: 'Timed out waiting for job to complete.', errors: [] })
+  setStatus({
+    job_id: current.job_id,
+    stage: 'error',
+    progress: current.progress,
+    message: 'Timed out waiting for job to complete.',
+    errors: [],
+  });
 }
 ```
 
@@ -101,18 +117,22 @@ uses `result.answer` unchecked — `result.answer` is typed `string` (non-option
 **Fix:** Replace the boolean variable with a type predicate / explicit null check inside JSX to avoid the force-unwrap:
 
 ```tsx
-{s?.kind === 'value' && s.value != null ? (
-  <div className="my-2">
-    <span className="text-5xl font-extrabold tracking-tight">
-      {s.value.toLocaleString()}
-    </span>
-    {s.unit && (
-      <span className="ml-2 text-2xl font-semibold text-muted-foreground">{s.unit}</span>
-    )}
-  </div>
-) : (
-  <p className="text-base leading-relaxed">{result.answer}</p>
-)}
+{
+  s?.kind === 'value' && s.value != null ? (
+    <div className="my-2">
+      <span className="text-5xl font-extrabold tracking-tight">
+        {s.value.toLocaleString()}
+      </span>
+      {s.unit && (
+        <span className="ml-2 text-2xl font-semibold text-muted-foreground">
+          {s.unit}
+        </span>
+      )}
+    </div>
+  ) : (
+    <p className="text-base leading-relaxed">{result.answer}</p>
+  );
+}
 ```
 
 ---
@@ -126,21 +146,21 @@ uses `result.answer` unchecked — `result.answer` is typed `string` (non-option
 **Fix:** Add an error state and render it below the button:
 
 ```tsx
-const [error, setError] = useState<string | null>(null)
+const [error, setError] = useState<string | null>(null);
 
 const handleRun = async () => {
-  setRunning(true)
-  setError(null)
+  setRunning(true);
+  setError(null);
   try {
-    await api.runBenchmark()
-    const fresh = await api.benchmarkResults()
-    setData(fresh)
+    await api.runBenchmark();
+    const fresh = await api.benchmarkResults();
+    setData(fresh);
   } catch (e) {
-    setError(e instanceof Error ? e.message : 'Benchmark run failed')
+    setError(e instanceof Error ? e.message : 'Benchmark run failed');
   } finally {
-    setRunning(false)
+    setRunning(false);
   }
-}
+};
 ```
 
 ---
@@ -152,7 +172,7 @@ const handleRun = async () => {
 **File:** `components/pipeline/DataStatusGrid.tsx:11`
 
 ```ts
-const tickers = Object.keys(status.downloaded)
+const tickers = Object.keys(status.downloaded);
 ```
 
 The grid is keyed entirely off `status.downloaded`. If the backend ever returns a `parsed` entry for a ticker that has no corresponding `downloaded` entry (e.g. pre-existing parsed files without a raw filing in the download cache), that ticker is not rendered at all, and its `parsed` status indicators are silently dropped. This is a data integrity display bug.
@@ -162,7 +182,7 @@ The grid is keyed entirely off `status.downloaded`. If the backend ever returns 
 ```ts
 const tickers = Array.from(
   new Set([...Object.keys(status.downloaded), ...Object.keys(status.parsed)])
-).sort()
+).sort();
 ```
 
 ---
@@ -172,13 +192,19 @@ const tickers = Array.from(
 **File:** `components/ask/EvidenceAccordion.tsx:20`
 
 ```tsx
-const meta = node.metadata as Record<string, string> | undefined
+const meta = node.metadata as Record<string, string> | undefined;
 ```
 
 `node.metadata` is typed `Record<string, unknown>` in `types.ts`. The cast to `Record<string, string>` is a lie — values could be numbers, booleans, or objects. Then on line 27:
 
 ```tsx
-{meta['score'] && <span>Score: <strong>{Number(meta['score']).toFixed(3)}</strong></span>}
+{
+  meta['score'] && (
+    <span>
+      Score: <strong>{Number(meta['score']).toFixed(3)}</strong>
+    </span>
+  );
+}
 ```
 
 This wraps the value in `Number()` presumably because the author knew the score might be a number already — but the cast to `string` suppresses the TypeScript warning. If `meta['company']` is an object (e.g. `{ name: "Apple" }`), it renders `[object Object]` in the UI.
@@ -186,14 +212,22 @@ This wraps the value in `Number()` presumably because the author knew the score 
 **Fix:** Keep the type honest and coerce to string for display:
 
 ```tsx
-const meta = node.metadata  // Record<string, unknown> | undefined
+const meta = node.metadata; // Record<string, unknown> | undefined
 // Then:
-{meta?.['company'] != null && (
-  <span>Company: <strong>{String(meta['company'])}</strong></span>
-)}
-{meta?.['score'] != null && (
-  <span>Score: <strong>{Number(meta['score']).toFixed(3)}</strong></span>
-)}
+{
+  meta?.['company'] != null && (
+    <span>
+      Company: <strong>{String(meta['company'])}</strong>
+    </span>
+  );
+}
+{
+  meta?.['score'] != null && (
+    <span>
+      Score: <strong>{Number(meta['score']).toFixed(3)}</strong>
+    </span>
+  );
+}
 ```
 
 ---
@@ -230,11 +264,14 @@ id: crypto.randomUUID(),
 
 ```ts
 useEffect(() => {
-  if (!active) { setCurrent(0); return }
-  const timings = [800, 1600, 2800]
-  const timers = timings.map((t, i) => setTimeout(() => setCurrent(i + 1), t))
-  return () => timers.forEach(clearTimeout)
-}, [active])
+  if (!active) {
+    setCurrent(0);
+    return;
+  }
+  const timings = [800, 1600, 2800];
+  const timers = timings.map((t, i) => setTimeout(() => setCurrent(i + 1), t));
+  return () => timers.forEach(clearTimeout);
+}, [active]);
 ```
 
 The effect depends only on `active`. If the user submits a query, waits 1.5 seconds (stage 2 advances to `current=2`), then submits another query, `active` remains `true` throughout. The effect never re-fires, so `current` stays at 2 and the animation skips stage 1. The user sees the reranking stage already checked off before retrieval completes.
@@ -300,7 +337,12 @@ Same issue: raw `<button>` styled from scratch. The button has correct `focus-vi
 **File:** `components/ask/QueryHistory.tsx:23`
 
 ```tsx
-<Button variant="ghost" size="icon" className="h-6 w-6 hover:text-destructive" onClick={onClear}>
+<Button
+  variant="ghost"
+  size="icon"
+  className="h-6 w-6 hover:text-destructive"
+  onClick={onClear}
+>
   <Trash2 className="h-3.5 w-3.5" />
 </Button>
 ```
@@ -351,7 +393,7 @@ The table renders `#`, `Question`, `Type`, `TRA`, and `ACS` columns, but omits `
 **File:** `app/ask/page.tsx:35`
 
 ```ts
-push(question, mode, data.graph)
+push(question, mode, data.graph);
 ```
 
 When mode is `'compare'`, the history entry's `answer` is populated from `data.graph.answer` (the structured/smart mode answer). The naive answer is silently dropped. A user who selects a history entry from a compare run will see only the graph-mode answer in the history display, with no indication that a comparison was run. This is misleading.
@@ -359,8 +401,8 @@ When mode is `'compare'`, the history entry's `answer` is populated from `data.g
 **Fix:** Either push two entries (one per mode), or push a combined entry with a truncated diff:
 
 ```ts
-push(question, 'graph', data.graph)
-push(question, 'naive', data.naive)
+push(question, 'graph', data.graph);
+push(question, 'naive', data.naive);
 ```
 
 Or accept the limitation and document it with a comment so the next developer understands the design decision.
@@ -372,9 +414,9 @@ Or accept the limitation and document it with a comment so the next developer un
 **File:** `app/benchmark/page.tsx:21-24`
 
 ```ts
-await api.runBenchmark()
-const fresh = await api.benchmarkResults()
-setData(fresh)
+await api.runBenchmark();
+const fresh = await api.benchmarkResults();
+setData(fresh);
 ```
 
 `api.runBenchmark()` returns a `PipelineStatusResponse` with a `job_id`, but the page discards it and immediately fetches results. The benchmark run is async on the server side — `runBenchmark` starts the job, it does not block until completion. Fetching results immediately after will return the **previous** benchmark results, not the freshly computed ones. The `PipelineTriggers` component correctly implements polling; this page does not.
@@ -410,7 +452,7 @@ The `shadcn` package in `package.json` is the CLI tool (`"shadcn": "^4.7.0"`). I
 **File:** `components/layout/Sidebar.tsx:35`
 
 ```ts
-path.startsWith(href)
+path.startsWith(href);
 ```
 
 This is currently safe because all nav hrefs are `/ask`, `/benchmark`, `/pipeline` — none is `/`. But `path.startsWith('/')` is always true for any path, so if a root link is ever added, all nav items would appear active simultaneously. A more robust check: `path === href || path.startsWith(href + '/')`.

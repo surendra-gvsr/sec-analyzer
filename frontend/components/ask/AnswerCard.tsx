@@ -1,12 +1,12 @@
-import { Badge } from '@/components/ui/badge'
-import type { QueryResponse } from '@/lib/types'
+import { Badge } from '@/components/ui/badge';
+import type { QueryResponse } from '@/lib/types';
 
 interface AnswerCardProps {
-  result: QueryResponse
+  result: QueryResponse;
 }
 
 export function AnswerCard({ result }: AnswerCardProps) {
-  const s = result.structured
+  const s = result.structured;
 
   return (
     <div className="rounded-xl border border-border bg-gradient-to-br from-chart-1/5 to-chart-2/5 p-6 shadow-md">
@@ -16,7 +16,9 @@ export function AnswerCard({ result }: AnswerCardProps) {
             {result.mode === 'graph' ? 'Smart Mode' : 'Basic Mode'}
           </Badge>
           {s?.metric && (
-            <Badge variant="outline" className="text-xs">{s.metric}</Badge>
+            <Badge variant="outline" className="text-xs">
+              {s.metric}
+            </Badge>
           )}
         </div>
         {s && (
@@ -28,16 +30,30 @@ export function AnswerCard({ result }: AnswerCardProps) {
                 style={{ width: `${Math.round(s.confidence * 100)}%` }}
               />
             </div>
-            <span className="font-medium">{Math.round(s.confidence * 100)}%</span>
+            <span className="font-medium">
+              {Math.round(s.confidence * 100)}%
+            </span>
           </div>
         )}
       </div>
 
       {s && (s.ticker || s.year) && (
         <div className="mb-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
-          {s.ticker && <span>Ticker: <strong className="text-foreground">{s.ticker}</strong></span>}
-          {s.year && <span>Year: <strong className="text-foreground">{s.year}</strong></span>}
-          {s.source && <span>Source: <strong className="text-foreground">{s.source}</strong></span>}
+          {s.ticker && (
+            <span>
+              Ticker: <strong className="text-foreground">{s.ticker}</strong>
+            </span>
+          )}
+          {s.year && (
+            <span>
+              Year: <strong className="text-foreground">{s.year}</strong>
+            </span>
+          )}
+          {s.source && (
+            <span>
+              Source: <strong className="text-foreground">{s.source}</strong>
+            </span>
+          )}
         </div>
       )}
 
@@ -47,7 +63,9 @@ export function AnswerCard({ result }: AnswerCardProps) {
             {s.value.toLocaleString()}
           </span>
           {s.unit && (
-            <span className="ml-2 text-2xl font-semibold text-muted-foreground">{s.unit}</span>
+            <span className="ml-2 text-2xl font-semibold text-muted-foreground">
+              {s.unit}
+            </span>
           )}
         </div>
       ) : (
@@ -61,8 +79,9 @@ export function AnswerCard({ result }: AnswerCardProps) {
       )}
 
       <p className="mt-3 text-xs text-muted-foreground">
-        {result.latency_ms.toFixed(0)}ms · {result.source_nodes.length} chunks retrieved
+        {result.latency_ms.toFixed(0)}ms · {result.source_nodes.length} chunks
+        retrieved
       </p>
     </div>
-  )
+  );
 }

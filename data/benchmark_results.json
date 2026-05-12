@@ -21,9 +21,7 @@
       "question": "What was Apple's research and development expense in fiscal year 2021?",
       "type": "single_year_table",
       "ticker": "AAPL",
-      "years": [
-        2021
-      ],
+      "years": [2021],
       "expected_value": "21914",
       "naive": {
         "answer": "$0.",
@@ -49,9 +47,7 @@
       "question": "What was Apple's research and development expense in fiscal year 2023?",
       "type": "single_year_table",
       "ticker": "AAPL",
-      "years": [
-        2023
-      ],
+      "years": [2023],
       "expected_value": "29915",
       "naive": {
         "answer": "The information provided does not directly mention the research and development expense for fiscal year 2023. However, it does mention that the Company's total net sales decreased 3% or $11.0 billion during 2023 compared to 2022, and that the weakness in foreign currencies relative to the U.S. dollar accounted for more than the entire year-over-year decrease in total net sales, which consisted primarily of lower net sales of Mac and iPhone, partially offset by higher net sales of Services.\n\nOperating Expenses include R&D and SG&A expenses.",
@@ -77,9 +73,7 @@
       "question": "What was Apple's net sales (total revenue) in fiscal year 2022?",
       "type": "single_year_table",
       "ticker": "AAPL",
-      "years": [
-        2022
-      ],
+      "years": [2022],
       "expected_value": "394328",
       "naive": {
         "answer": "$394,328 million.",
@@ -105,10 +99,7 @@
       "question": "How did Apple's R&D expenses change from 2021 to 2023?",
       "type": "multi_year_trend",
       "ticker": "AAPL",
-      "years": [
-        2021,
-        2023
-      ],
+      "years": [2021, 2023],
       "expected_value": null,
       "naive": {
         "answer": "Unfortunately, the provided context information does not contain explicit data on Apple's R&D expenses for the years 2021 and 2023. However, we can infer that Apple's R&D expenses likely increased from 2021 to 2023, given the company's significant investments in new product development, such as the Apple Vision Pro, and its growing services segment.",
@@ -134,9 +125,7 @@
       "question": "What was Microsoft's revenue from cloud services (Intelligent Cloud segment) in fiscal year 2022?",
       "type": "single_year_table",
       "ticker": "MSFT",
-      "years": [
-        2022
-      ],
+      "years": [2022],
       "expected_value": "75251",
       "naive": {
         "answer": "$63,364.",
@@ -162,9 +151,7 @@
       "question": "What were Microsoft's total operating expenses in fiscal year 2023?",
       "type": "single_year_table",
       "ticker": "MSFT",
-      "years": [
-        2023
-      ],
+      "years": [2023],
       "expected_value": "134000",
       "naive": {
         "answer": "$A: $157,011",
@@ -190,9 +177,7 @@
       "question": "What was Apple's gross margin percentage in fiscal year 2022?",
       "type": "single_year_table",
       "ticker": "AAPL",
-      "years": [
-        2022
-      ],
+      "years": [2022],
       "expected_value": "43.3",
       "naive": {
         "answer": "To find Apple's gross margin percentage in fiscal year 2022, we need to calculate the gross margin as a percentage of revenue. \n\nGross Margin = $170.8 billion (Gross Margin) / $394.3 billion (Revenue) \nGross Margin Percentage = (Gross Margin / Revenue) * 100 \nGross Margin Percentage = ($170.8 billion / $394.3 billion) * 100 \nGross Margin Percentage \u2248 43.37%",
@@ -218,9 +203,7 @@
       "question": "What risk factors did Apple identify related to supply chain in its 2022 10-K filing?",
       "type": "risk_factor",
       "ticker": "AAPL",
-      "years": [
-        2022
-      ],
+      "years": [2022],
       "expected_value": null,
       "naive": {
         "answer": "Apple identified risks related to supply chain, including those associated with the management of complex global supply chains, the availability and pricing of raw materials, and the potential for disruptions to supply chains due to various factors such as natural disasters, public health crises, and geopolitical events.",
@@ -246,11 +229,7 @@
       "question": "How did Microsoft's net income change from fiscal year 2021 to fiscal year 2023?",
       "type": "multi_year_trend",
       "ticker": "MSFT",
-      "years": [
-        2021,
-        2022,
-        2023
-      ],
+      "years": [2021, 2022, 2023],
       "expected_value": null,
       "naive": {
         "answer": "Microsoft's net income increased by $3.0 billion in fiscal year 2023 due to a change in accounting estimate for the useful lives of server and network equipment.",
@@ -276,9 +255,7 @@
       "question": "What was Apple's Americas segment revenue in fiscal year 2021?",
       "type": "single_year_table",
       "ticker": "AAPL",
-      "years": [
-        2021
-      ],
+      "years": [2021],
       "expected_value": "153306",
       "naive": {
         "answer": "$153,306 million.",

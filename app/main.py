@@ -55,9 +55,10 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
+    import asyncio
     from app.pipeline import query_engine
     log.info("Starting SEC Analyzer…")
-    ok = query_engine.initialise()
+    ok = await asyncio.to_thread(query_engine.initialise)
     if ok:
         log.info("GraphRAG index loaded successfully.")
     else:

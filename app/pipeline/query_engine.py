@@ -108,11 +108,10 @@ def _initialise_structured_fallback() -> bool:
         log.error("Missing dependency: %s", e)
         return False
 
-    llm = Groq(model=settings.groq_model, api_key=settings.groq_api_key)
-    embed_model = FastEmbedEmbedding(model_name="BAAI/bge-small-en-v1.5")
-    LISettings.llm = llm
-    LISettings.embed_model = embed_model
-
+    # Check collection exists BEFORE downloading the ONNX embedding model.
+    # On a fresh deploy (no persistent ChromaDB), failing early avoids a
+    # 90-second model download that blocks uvicorn's event loop and causes
+    # Render health checks to time out.
     chroma_client = chromadb.PersistentClient(path=settings.chroma_db_dir)
     try:
         collection = chroma_client.get_collection("structured_chunks")
@@ -120,6 +119,11 @@ def _initialise_structured_fallback() -> bool:
         log.warning("structured_chunks collection not found — run build_index.py --naive-only")
         _is_ready = False
         return False
+
+    llm = Groq(model=settings.groq_model, api_key=settings.groq_api_key)
+    embed_model = FastEmbedEmbedding(model_name="BAAI/bge-small-en-v1.5")
+    LISettings.llm = llm
+    LISettings.embed_model = embed_model
 
     vector_store = ChromaVectorStore(chroma_collection=collection)
     storage_context = StorageContext.from_defaults(vector_store=vector_store)

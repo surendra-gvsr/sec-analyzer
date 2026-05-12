@@ -10,15 +10,15 @@ services:
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
-        value: "3.12.4"
+        value: '3.12.4'
       - key: ENVIRONMENT
         value: production
       - key: GROQ_MODEL
         value: llama3-8b-8192
       - key: TARGET_TICKERS
-        value: "AAPL,MSFT"
+        value: 'AAPL,MSFT'
       - key: TARGET_YEARS
-        value: "2021,2022,2023,2024"
+        value: '2021,2022,2023,2024'
       - key: LLAMA_CLOUD_API_KEY
         sync: false
       - key: GROQ_API_KEY

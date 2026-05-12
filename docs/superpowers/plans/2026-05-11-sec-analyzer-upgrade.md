@@ -15,44 +15,54 @@
 ### Task 0: Copy tooling + bootstrap GSD
 
 **Files:**
+
 - Copy: `.claude/` from `C:\Users\gujju\my-project-ui`
 - Copy: `.husky/` from `C:\Users\gujju\my-project-ui`
 - Copy: `.prettierrc` from `C:\Users\gujju\my-project-ui`
 - Copy: `.secretlintrc.json` from `C:\Users\gujju\my-project-ui`
 
 - [ ] **Step 1: Copy .claude folder**
+
 ```powershell
 Copy-Item "C:\Users\gujju\my-project-ui\.claude" "D:\0001-Full Time\Projects\sec_analyzer\.claude" -Recurse -Force
 ```
 
 - [ ] **Step 2: Copy .husky folder**
+
 ```powershell
 Copy-Item "C:\Users\gujju\my-project-ui\.husky" "D:\0001-Full Time\Projects\sec_analyzer\.husky" -Recurse -Force
 ```
 
 - [ ] **Step 3: Copy config files**
+
 ```powershell
 Copy-Item "C:\Users\gujju\my-project-ui\.prettierrc" "D:\0001-Full Time\Projects\sec_analyzer\.prettierrc" -Force
 Copy-Item "C:\Users\gujju\my-project-ui\.secretlintrc.json" "D:\0001-Full Time\Projects\sec_analyzer\.secretlintrc.json" -Force
 ```
 
 - [ ] **Step 4: Run graphify install**
+
 ```bash
 cd "D:\0001-Full Time\Projects\sec_analyzer"
 graphify install
 ```
+
 Expected: GSD workspace initialised, `.planning/` directory created.
 
 - [ ] **Step 5: Run graphify claude install**
+
 ```bash
 graphify claude install
 ```
+
 Expected: Claude Code integration configured.
 
 - [ ] **Step 6: Record session context via GSD**
+
 ```bash
 graphify record-session
 ```
+
 Expected: Current brainstorming context saved to GSD workspace.
 
 ---
@@ -62,6 +72,7 @@ Expected: Current brainstorming context saved to GSD workspace.
 ### Task 1: Scaffold Next.js 14 app
 
 **Files:**
+
 - Create: `frontend/` (entire directory)
 - Create: `frontend/package.json`
 - Create: `frontend/next.config.ts`
@@ -72,12 +83,14 @@ Expected: Current brainstorming context saved to GSD workspace.
 - Create: `frontend/tailwind.config.ts`
 
 - [ ] **Step 1: Create Next.js app**
+
 ```bash
 cd "D:\0001-Full Time\Projects\sec_analyzer"
 npx create-next-app@14 frontend --typescript --tailwind --eslint --app --no-src-dir --import-alias "@/*"
 ```
 
 - [ ] **Step 2: Install dependencies**
+
 ```bash
 cd frontend
 npm install recharts lucide-react class-variance-authority clsx tailwind-merge
@@ -85,15 +98,19 @@ npm install -D @types/node
 ```
 
 - [ ] **Step 3: Install shadcn/ui**
+
 ```bash
 npx shadcn@latest init
 ```
+
 When prompted:
+
 - Style: `base-nova`
 - Base color: `neutral`
 - CSS variables: `yes`
 
 - [ ] **Step 4: Add required shadcn components**
+
 ```bash
 npx shadcn@latest add button input card badge separator scroll-area sheet tooltip
 ```
@@ -101,6 +118,7 @@ npx shadcn@latest add button input card badge separator scroll-area sheet toolti
 - [ ] **Step 5: Replace globals.css with project theme**
 
 Replace `frontend/app/globals.css` with:
+
 ```css
 @import 'tailwindcss';
 @import 'tw-animate-css';
@@ -218,33 +236,41 @@ Replace `frontend/app/globals.css` with:
 }
 
 @layer base {
-  * { @apply border-border outline-ring/50; }
-  body { @apply bg-background text-foreground; }
-  html { @apply font-sans; }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }
 ```
 
 - [ ] **Step 6: Create next.config.ts with API rewrite**
+
 ```ts
 // frontend/next.config.ts
-import type { NextConfig } from 'next'
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   async rewrites() {
-    const apiUrl = process.env.RENDER_API_URL ?? 'http://127.0.0.1:8000'
+    const apiUrl = process.env.RENDER_API_URL ?? 'http://127.0.0.1:8000';
     return [
       {
         source: '/api/:path*',
         destination: `${apiUrl}/api/:path*`,
       },
-    ]
+    ];
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
 ```
 
 - [ ] **Step 7: Create .env.local.example**
+
 ```bash
 # frontend/.env.local.example
 NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
@@ -252,10 +278,12 @@ RENDER_API_URL=http://127.0.0.1:8000
 ```
 
 - [ ] **Step 8: Verify build compiles**
+
 ```bash
 cd frontend
 npm run build
 ```
+
 Expected: Build succeeds with no TypeScript errors.
 
 ---
@@ -263,6 +291,7 @@ Expected: Build succeeds with no TypeScript errors.
 ### Task 2: Types + API client
 
 **Files:**
+
 - Create: `frontend/lib/types.ts`
 - Create: `frontend/lib/api.ts`
 - Create: `frontend/lib/utils.ts` (cn helper — shadcn generates this)
@@ -270,115 +299,117 @@ Expected: Build succeeds with no TypeScript errors.
 - [ ] **Step 1: Write types mirroring app/models.py**
 
 Create `frontend/lib/types.ts`:
+
 ```ts
 export interface StructuredAnswer {
-  kind: 'value' | 'trend' | 'qualitative'
-  value?: number
-  unit?: string
-  year?: number
-  ticker?: string
-  metric?: string
-  source?: string
-  confidence: number
-  series: Array<{ year: number; value: number; unit?: string }>
+  kind: 'value' | 'trend' | 'qualitative';
+  value?: number;
+  unit?: string;
+  year?: number;
+  ticker?: string;
+  metric?: string;
+  source?: string;
+  confidence: number;
+  series: Array<{ year: number; value: number; unit?: string }>;
 }
 
 export interface QueryResponse {
-  answer: string
+  answer: string;
   source_nodes: Array<{
-    text: string
-    score?: number
-    metadata?: Record<string, unknown>
-  }>
-  graph_path: string[]
-  latency_ms: number
-  mode: string
-  structured?: StructuredAnswer
+    text: string;
+    score?: number;
+    metadata?: Record<string, unknown>;
+  }>;
+  graph_path: string[];
+  latency_ms: number;
+  mode: string;
+  structured?: StructuredAnswer;
 }
 
 export interface CompareResponse {
-  question: string
-  graph: QueryResponse
-  naive: QueryResponse
+  question: string;
+  graph: QueryResponse;
+  naive: QueryResponse;
 }
 
 export interface PipelineStatusResponse {
-  job_id: string
-  stage: string
-  progress: number
-  message: string
-  errors: string[]
+  job_id: string;
+  stage: string;
+  progress: number;
+  message: string;
+  errors: string[];
 }
 
 export interface DataStatusResponse {
-  downloaded: Record<string, number[]>
-  parsed: Record<string, number[]>
-  index_stats: Record<string, unknown>
+  downloaded: Record<string, number[]>;
+  parsed: Record<string, number[]>;
+  index_stats: Record<string, unknown>;
 }
 
 export interface BenchmarkResult {
-  question_id: string
-  question: string
-  question_type: string
-  expected: unknown
-  graph_answer?: string
-  naive_answer?: string
-  tra_graph: boolean
-  tra_naive: boolean
-  acs_graph?: number
-  acs_naive?: number
-  cyc_graph?: boolean
-  cyc_naive?: boolean
-  confidence?: number
+  question_id: string;
+  question: string;
+  question_type: string;
+  expected: unknown;
+  graph_answer?: string;
+  naive_answer?: string;
+  tra_graph: boolean;
+  tra_naive: boolean;
+  acs_graph?: number;
+  acs_naive?: number;
+  cyc_graph?: boolean;
+  cyc_naive?: boolean;
+  confidence?: number;
 }
 
 export interface BenchmarkResultResponse {
-  generated_at: string
-  total_questions: number
+  generated_at: string;
+  total_questions: number;
   summary: {
-    structured: { TRA: number; ACS: number; CYC: number }
-    naive: { TRA: number; ACS: number; CYC: number }
-  }
-  results: BenchmarkResult[]
+    structured: { TRA: number; ACS: number; CYC: number };
+    naive: { TRA: number; ACS: number; CYC: number };
+  };
+  results: BenchmarkResult[];
 }
 
 export interface HealthResponse {
-  status: string
-  environment: string
-  index_ready: boolean
-  graph_nodes: number
-  graph_edges: number
+  status: string;
+  environment: string;
+  index_ready: boolean;
+  graph_nodes: number;
+  graph_edges: number;
 }
 
-export type QueryMode = 'graph' | 'naive'
+export type QueryMode = 'graph' | 'naive';
 ```
 
 - [ ] **Step 2: Write typed API client**
 
 Create `frontend/lib/api.ts`:
+
 ```ts
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? ''
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 async function post<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-  })
+  });
   if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`${res.status}: ${text}`)
+    const text = await res.text();
+    throw new Error(`${res.status}: ${text}`);
   }
-  return res.json() as Promise<T>
+  return res.json() as Promise<T>;
 }
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, { cache: 'no-store' })
+  const res = await fetch(`${BASE}${path}`, { cache: 'no-store' });
   if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`${res.status}: ${text}`)
+    const text = await res.text();
+    throw new Error(`${res.status}: ${text}`);
   }
-  return res.json() as Promise<T>
+  return res.json() as Promise<T>;
 }
 
 import type {
@@ -388,7 +419,7 @@ import type {
   PipelineStatusResponse,
   QueryResponse,
   QueryMode,
-} from './types'
+} from './types';
 
 export const api = {
   query: (question: string, mode: QueryMode) =>
@@ -400,11 +431,9 @@ export const api = {
   benchmarkResults: () =>
     get<BenchmarkResultResponse>('/api/benchmark/results'),
 
-  runBenchmark: () =>
-    post<PipelineStatusResponse>('/api/benchmark/run', {}),
+  runBenchmark: () => post<PipelineStatusResponse>('/api/benchmark/run', {}),
 
-  dataStatus: () =>
-    get<DataStatusResponse>('/api/pipeline/data-status'),
+  dataStatus: () => get<DataStatusResponse>('/api/pipeline/data-status'),
 
   download: (tickers?: string[], years?: number[]) =>
     post<PipelineStatusResponse>('/api/pipeline/download', { tickers, years }),
@@ -413,14 +442,18 @@ export const api = {
     post<PipelineStatusResponse>('/api/pipeline/parse', { tickers, years }),
 
   buildIndex: (tickers?: string[], years?: number[]) =>
-    post<PipelineStatusResponse>('/api/pipeline/build-index', { tickers, years }),
+    post<PipelineStatusResponse>('/api/pipeline/build-index', {
+      tickers,
+      years,
+    }),
 
   pollStatus: (jobId: string) =>
     get<PipelineStatusResponse>(`/api/pipeline/status/${jobId}`),
-}
+};
 ```
 
 - [ ] **Step 3: Commit scaffold**
+
 ```bash
 cd "D:\0001-Full Time\Projects\sec_analyzer"
 git add frontend/
@@ -432,6 +465,7 @@ git commit -m "feat: scaffold Next.js 14 frontend with types and API client"
 ### Task 3: AppShell + Sidebar layout
 
 **Files:**
+
 - Create: `frontend/app/layout.tsx`
 - Create: `frontend/app/page.tsx`
 - Create: `frontend/components/layout/AppShell.tsx`
@@ -441,22 +475,23 @@ git commit -m "feat: scaffold Next.js 14 frontend with types and API client"
 - [ ] **Step 1: Create Sidebar component**
 
 Create `frontend/components/layout/Sidebar.tsx`:
-```tsx
-'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { MessageSquare, BarChart2, Settings2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+```tsx
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { MessageSquare, BarChart2, Settings2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const NAV = [
   { href: '/ask', label: 'Ask', icon: MessageSquare },
   { href: '/benchmark', label: 'Benchmark', icon: BarChart2 },
   { href: '/pipeline', label: 'Pipeline', icon: Settings2 },
-]
+];
 
 export function Sidebar() {
-  const path = usePathname()
+  const path = usePathname();
   return (
     <aside className="flex h-full w-60 flex-col border-r border-border bg-sidebar">
       <div className="flex items-center gap-3 border-b border-sidebar-border px-5 py-4">
@@ -464,7 +499,9 @@ export function Sidebar() {
           IQ
         </div>
         <div>
-          <p className="text-sm font-semibold text-sidebar-foreground">FilingsIQ</p>
+          <p className="text-sm font-semibold text-sidebar-foreground">
+            FilingsIQ
+          </p>
           <p className="text-xs text-muted-foreground">SEC 10-K Intelligence</p>
         </div>
       </div>
@@ -477,7 +514,7 @@ export function Sidebar() {
               'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
               'text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground',
               path.startsWith(href) &&
-                'bg-sidebar-accent text-sidebar-foreground shadow-[inset_2px_0_0_hsl(var(--sidebar-primary))]',
+                'bg-sidebar-accent text-sidebar-foreground shadow-[inset_2px_0_0_hsl(var(--sidebar-primary))]'
             )}
           >
             <Icon className="h-4 w-4 shrink-0" />
@@ -489,24 +526,25 @@ export function Sidebar() {
         GraphRAG · Groq · ChromaDB
       </div>
     </aside>
-  )
+  );
 }
 ```
 
 - [ ] **Step 2: Create MobileHeader**
 
 Create `frontend/components/layout/MobileHeader.tsx`:
-```tsx
-'use client'
 
-import { Menu } from 'lucide-react'
-import { useState } from 'react'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Button } from '@/components/ui/button'
-import { Sidebar } from './Sidebar'
+```tsx
+'use client';
+
+import { Menu } from 'lucide-react';
+import { useState } from 'react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Sidebar } from './Sidebar';
 
 export function MobileHeader() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   return (
     <header className="flex h-14 items-center gap-3 border-b border-border bg-background px-4 md:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
@@ -521,16 +559,17 @@ export function MobileHeader() {
       </Sheet>
       <span className="text-sm font-semibold">FilingsIQ</span>
     </header>
-  )
+  );
 }
 ```
 
 - [ ] **Step 3: Create AppShell**
 
 Create `frontend/components/layout/AppShell.tsx`:
+
 ```tsx
-import { Sidebar } from './Sidebar'
-import { MobileHeader } from './MobileHeader'
+import { Sidebar } from './Sidebar';
+import { MobileHeader } from './MobileHeader';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -540,65 +579,75 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
       <div className="flex flex-1 flex-col md:pl-60">
         <MobileHeader />
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 4: Create root layout**
 
 Replace `frontend/app/layout.tsx`:
+
 ```tsx
-import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
-import { AppShell } from '@/components/layout/AppShell'
-import './globals.css'
+import type { Metadata } from 'next';
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
+import { AppShell } from '@/components/layout/AppShell';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'FilingsIQ — SEC 10-K Intelligence',
   description: 'Multi-year SEC 10-K trend analysis powered by GraphRAG',
-}
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className="dark">
-      <body className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+      <body
+        className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
+      >
         <AppShell>{children}</AppShell>
       </body>
     </html>
-  )
+  );
 }
 ```
 
 - [ ] **Step 5: Create root page redirect**
 
 Create `frontend/app/page.tsx`:
+
 ```tsx
-import { redirect } from 'next/navigation'
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  redirect('/ask')
+  redirect('/ask');
 }
 ```
 
 - [ ] **Step 6: Install geist font**
+
 ```bash
 cd frontend
 npm install geist
 ```
 
 - [ ] **Step 7: Verify dev server starts**
+
 ```bash
 npm run dev
 ```
+
 Open `http://localhost:3000` — should redirect to `/ask` (404 page for now is fine).
 
 - [ ] **Step 8: Commit**
+
 ```bash
 git add frontend/
 git commit -m "feat: add AppShell, Sidebar, MobileHeader layout components"
@@ -611,6 +660,7 @@ git commit -m "feat: add AppShell, Sidebar, MobileHeader layout components"
 ### Task 4: Ask tab — QueryInput + ModeSelector + ExampleCards
 
 **Files:**
+
 - Create: `frontend/components/ask/ModeSelector.tsx`
 - Create: `frontend/components/ask/QueryInput.tsx`
 - Create: `frontend/components/ask/ExampleCards.tsx`
@@ -619,22 +669,23 @@ git commit -m "feat: add AppShell, Sidebar, MobileHeader layout components"
 - [ ] **Step 1: Create ModeSelector**
 
 Create `frontend/components/ask/ModeSelector.tsx`:
-```tsx
-'use client'
 
-import { cn } from '@/lib/utils'
-import type { QueryMode } from '@/lib/types'
+```tsx
+'use client';
+
+import { cn } from '@/lib/utils';
+import type { QueryMode } from '@/lib/types';
 
 interface ModeSelectorProps {
-  mode: QueryMode | 'compare'
-  onChange: (m: QueryMode | 'compare') => void
+  mode: QueryMode | 'compare';
+  onChange: (m: QueryMode | 'compare') => void;
 }
 
 const MODES: { value: QueryMode | 'compare'; label: string }[] = [
   { value: 'graph', label: 'Smart' },
   { value: 'naive', label: 'Basic' },
   { value: 'compare', label: 'Compare' },
-]
+];
 
 export function ModeSelector({ mode, onChange }: ModeSelectorProps) {
   return (
@@ -646,35 +697,60 @@ export function ModeSelector({ mode, onChange }: ModeSelectorProps) {
           className={cn(
             'rounded-md px-3 py-1.5 text-xs font-semibold transition-all',
             'text-muted-foreground hover:text-foreground',
-            mode === value && 'bg-primary text-primary-foreground shadow-sm',
+            mode === value && 'bg-primary text-primary-foreground shadow-sm'
           )}
         >
           {label}
         </button>
       ))}
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 2: Create ExampleCards**
 
 Create `frontend/components/ask/ExampleCards.tsx`:
+
 ```tsx
-'use client'
+'use client';
 
 interface ExampleCardsProps {
-  onSelect: (q: string) => void
+  onSelect: (q: string) => void;
 }
 
 const EXAMPLES = [
-  { tag: 'Revenue', tagClass: 'text-chart-1', q: "What was Apple's total revenue in 2023?" },
-  { tag: 'Trend', tagClass: 'text-chart-3', q: "How did Microsoft's operating income trend from 2021 to 2023?" },
-  { tag: 'Margin', tagClass: 'text-chart-2', q: "What was Apple's gross margin in 2022?" },
-  { tag: 'Risk', tagClass: 'text-chart-4', q: "What are the main risk factors Apple disclosed in 2023?" },
-  { tag: 'Compare', tagClass: 'text-chart-5', q: "Compare Apple and Microsoft R&D spending in 2023." },
-  { tag: 'Trend', tagClass: 'text-chart-3', q: "How did Apple's net income change from 2021 to 2024?" },
-]
+  {
+    tag: 'Revenue',
+    tagClass: 'text-chart-1',
+    q: "What was Apple's total revenue in 2023?",
+  },
+  {
+    tag: 'Trend',
+    tagClass: 'text-chart-3',
+    q: "How did Microsoft's operating income trend from 2021 to 2023?",
+  },
+  {
+    tag: 'Margin',
+    tagClass: 'text-chart-2',
+    q: "What was Apple's gross margin in 2022?",
+  },
+  {
+    tag: 'Risk',
+    tagClass: 'text-chart-4',
+    q: 'What are the main risk factors Apple disclosed in 2023?',
+  },
+  {
+    tag: 'Compare',
+    tagClass: 'text-chart-5',
+    q: 'Compare Apple and Microsoft R&D spending in 2023.',
+  },
+  {
+    tag: 'Trend',
+    tagClass: 'text-chart-3',
+    q: "How did Apple's net income change from 2021 to 2024?",
+  },
+];
 
 export function ExampleCards({ onSelect }: ExampleCardsProps) {
   return (
@@ -685,47 +761,59 @@ export function ExampleCards({ onSelect }: ExampleCardsProps) {
           onClick={() => onSelect(q)}
           className="group rounded-xl border border-border bg-card p-4 text-left transition-all hover:-translate-y-0.5 hover:border-border/80 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <span className={`mb-2 inline-block rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${tagClass} bg-current/10`}>
+          <span
+            className={`mb-2 inline-block rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${tagClass} bg-current/10`}
+          >
             {tag}
           </span>
-          <p className="text-sm text-foreground/80 leading-snug group-hover:text-foreground">{q}</p>
+          <p className="text-sm text-foreground/80 leading-snug group-hover:text-foreground">
+            {q}
+          </p>
         </button>
       ))}
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 3: Create QueryInput**
 
 Create `frontend/components/ask/QueryInput.tsx`:
-```tsx
-'use client'
 
-import { Send } from 'lucide-react'
-import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button'
-import { ModeSelector } from './ModeSelector'
-import type { QueryMode } from '@/lib/types'
+```tsx
+'use client';
+
+import { Send } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { ModeSelector } from './ModeSelector';
+import type { QueryMode } from '@/lib/types';
 
 interface QueryInputProps {
-  value: string
-  onChange: (v: string) => void
-  mode: QueryMode | 'compare'
-  onModeChange: (m: QueryMode | 'compare') => void
-  onSubmit: () => void
-  loading: boolean
+  value: string;
+  onChange: (v: string) => void;
+  mode: QueryMode | 'compare';
+  onModeChange: (m: QueryMode | 'compare') => void;
+  onSubmit: () => void;
+  loading: boolean;
 }
 
-export function QueryInput({ value, onChange, mode, onModeChange, onSubmit, loading }: QueryInputProps) {
+export function QueryInput({
+  value,
+  onChange,
+  mode,
+  onModeChange,
+  onSubmit,
+  loading,
+}: QueryInputProps) {
   const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) onSubmit()
-  }
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) onSubmit();
+  };
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
       <Textarea
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKey}
         placeholder="Ask a question about SEC 10-K filings..."
         className="min-h-14 resize-none border-0 bg-transparent p-0 text-base shadow-none focus-visible:ring-0"
@@ -733,39 +821,45 @@ export function QueryInput({ value, onChange, mode, onModeChange, onSubmit, load
       />
       <div className="mt-3 flex items-center justify-between gap-3 flex-wrap">
         <ModeSelector mode={mode} onChange={onModeChange} />
-        <Button onClick={onSubmit} disabled={loading || !value.trim()} size="sm" className="gap-2">
+        <Button
+          onClick={onSubmit}
+          disabled={loading || !value.trim()}
+          size="sm"
+          className="gap-2"
+        >
           <Send className="h-3.5 w-3.5" />
           {loading ? 'Thinking…' : 'Ask'}
         </Button>
       </div>
       <p className="mt-2 text-xs text-muted-foreground">⌘ + Enter to submit</p>
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 4: Create Ask page skeleton**
 
 Create `frontend/app/ask/page.tsx`:
-```tsx
-'use client'
 
-import { useState } from 'react'
-import { QueryInput } from '@/components/ask/QueryInput'
-import { ExampleCards } from '@/components/ask/ExampleCards'
-import type { QueryMode } from '@/lib/types'
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { QueryInput } from '@/components/ask/QueryInput';
+import { ExampleCards } from '@/components/ask/ExampleCards';
+import type { QueryMode } from '@/lib/types';
 
 export default function AskPage() {
-  const [question, setQuestion] = useState('')
-  const [mode, setMode] = useState<QueryMode | 'compare'>('graph')
-  const [loading, setLoading] = useState(false)
+  const [question, setQuestion] = useState('');
+  const [mode, setMode] = useState<QueryMode | 'compare'>('graph');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!question.trim()) return
-    setLoading(true)
+    if (!question.trim()) return;
+    setLoading(true);
     // Results rendering added in Task 5
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 md:px-8">
@@ -789,15 +883,20 @@ export default function AskPage() {
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Example Questions
           </p>
-          <ExampleCards onSelect={q => { setQuestion(q); }} />
+          <ExampleCards
+            onSelect={(q) => {
+              setQuestion(q);
+            }}
+          />
         </div>
       </div>
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 5: Commit**
+
 ```bash
 git add frontend/
 git commit -m "feat: ask tab QueryInput, ModeSelector, ExampleCards"
@@ -808,6 +907,7 @@ git commit -m "feat: ask tab QueryInput, ModeSelector, ExampleCards"
 ### Task 5: AnswerCard + EvidenceAccordion
 
 **Files:**
+
 - Create: `frontend/components/ask/AnswerCard.tsx`
 - Create: `frontend/components/ask/EvidenceAccordion.tsx`
 - Modify: `frontend/app/ask/page.tsx` (wire up API call + render results)
@@ -815,17 +915,18 @@ git commit -m "feat: ask tab QueryInput, ModeSelector, ExampleCards"
 - [ ] **Step 1: Create AnswerCard**
 
 Create `frontend/components/ask/AnswerCard.tsx`:
+
 ```tsx
-import { Badge } from '@/components/ui/badge'
-import type { QueryResponse } from '@/lib/types'
+import { Badge } from '@/components/ui/badge';
+import type { QueryResponse } from '@/lib/types';
 
 interface AnswerCardProps {
-  result: QueryResponse
+  result: QueryResponse;
 }
 
 export function AnswerCard({ result }: AnswerCardProps) {
-  const s = result.structured
-  const isNumeric = s?.kind === 'value' && s.value != null
+  const s = result.structured;
+  const isNumeric = s?.kind === 'value' && s.value != null;
 
   return (
     <div className="rounded-xl border border-border bg-gradient-to-br from-chart-1/5 to-chart-2/5 p-6 shadow-md">
@@ -835,7 +936,9 @@ export function AnswerCard({ result }: AnswerCardProps) {
             {result.mode === 'graph' ? 'Smart Mode' : 'Basic Mode'}
           </Badge>
           {s?.metric && (
-            <Badge variant="outline" className="text-xs">{s.metric}</Badge>
+            <Badge variant="outline" className="text-xs">
+              {s.metric}
+            </Badge>
           )}
         </div>
         {s && (
@@ -847,16 +950,30 @@ export function AnswerCard({ result }: AnswerCardProps) {
                 style={{ width: `${Math.round(s.confidence * 100)}%` }}
               />
             </div>
-            <span className="font-medium">{Math.round(s.confidence * 100)}%</span>
+            <span className="font-medium">
+              {Math.round(s.confidence * 100)}%
+            </span>
           </div>
         )}
       </div>
 
       {s && (s.ticker || s.year) && (
         <div className="mb-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
-          {s.ticker && <span>Ticker: <strong className="text-foreground">{s.ticker}</strong></span>}
-          {s.year && <span>Year: <strong className="text-foreground">{s.year}</strong></span>}
-          {s.source && <span>Source: <strong className="text-foreground">{s.source}</strong></span>}
+          {s.ticker && (
+            <span>
+              Ticker: <strong className="text-foreground">{s.ticker}</strong>
+            </span>
+          )}
+          {s.year && (
+            <span>
+              Year: <strong className="text-foreground">{s.year}</strong>
+            </span>
+          )}
+          {s.source && (
+            <span>
+              Source: <strong className="text-foreground">{s.source}</strong>
+            </span>
+          )}
         </div>
       )}
 
@@ -866,7 +983,9 @@ export function AnswerCard({ result }: AnswerCardProps) {
             {s!.value!.toLocaleString()}
           </span>
           {s!.unit && (
-            <span className="ml-2 text-2xl font-semibold text-muted-foreground">{s!.unit}</span>
+            <span className="ml-2 text-2xl font-semibold text-muted-foreground">
+              {s!.unit}
+            </span>
           )}
         </div>
       ) : (
@@ -880,28 +999,30 @@ export function AnswerCard({ result }: AnswerCardProps) {
       )}
 
       <p className="mt-3 text-xs text-muted-foreground">
-        {result.latency_ms.toFixed(0)}ms · {result.source_nodes.length} chunks retrieved
+        {result.latency_ms.toFixed(0)}ms · {result.source_nodes.length} chunks
+        retrieved
       </p>
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 2: Create EvidenceAccordion**
 
 Create `frontend/components/ask/EvidenceAccordion.tsx`:
-```tsx
-'use client'
 
-import { ChevronRight } from 'lucide-react'
-import type { QueryResponse } from '@/lib/types'
+```tsx
+'use client';
+
+import { ChevronRight } from 'lucide-react';
+import type { QueryResponse } from '@/lib/types';
 
 interface EvidenceAccordionProps {
-  nodes: QueryResponse['source_nodes']
+  nodes: QueryResponse['source_nodes'];
 }
 
 export function EvidenceAccordion({ nodes }: EvidenceAccordionProps) {
-  if (!nodes.length) return null
+  if (!nodes.length) return null;
   return (
     <details className="group rounded-xl border border-border bg-card overflow-hidden">
       <summary className="flex cursor-pointer select-none list-none items-center gap-2 px-5 py-3.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors">
@@ -910,66 +1031,84 @@ export function EvidenceAccordion({ nodes }: EvidenceAccordionProps) {
       </summary>
       <div className="flex flex-col gap-2 px-5 pb-5">
         {nodes.map((node, i) => {
-          const meta = node.metadata as Record<string, string> | undefined
+          const meta = node.metadata as Record<string, string> | undefined;
           return (
-            <div key={i} className="rounded-lg border border-border bg-muted/50 p-3">
+            <div
+              key={i}
+              className="rounded-lg border border-border bg-muted/50 p-3"
+            >
               {meta && (
                 <div className="mb-1.5 flex gap-3 text-[10px] text-muted-foreground">
-                  {meta['company'] && <span>Company: <strong>{meta['company']}</strong></span>}
-                  {meta['year'] && <span>Year: <strong>{meta['year']}</strong></span>}
-                  {meta['score'] && <span>Score: <strong>{Number(meta['score']).toFixed(3)}</strong></span>}
+                  {meta['company'] && (
+                    <span>
+                      Company: <strong>{meta['company']}</strong>
+                    </span>
+                  )}
+                  {meta['year'] && (
+                    <span>
+                      Year: <strong>{meta['year']}</strong>
+                    </span>
+                  )}
+                  {meta['score'] && (
+                    <span>
+                      Score: <strong>{Number(meta['score']).toFixed(3)}</strong>
+                    </span>
+                  )}
                 </div>
               )}
-              <p className="line-clamp-3 text-xs text-muted-foreground">{node.text}</p>
+              <p className="line-clamp-3 text-xs text-muted-foreground">
+                {node.text}
+              </p>
             </div>
-          )
+          );
         })}
       </div>
     </details>
-  )
+  );
 }
 ```
 
 - [ ] **Step 3: Wire API call into Ask page**
 
 Replace `frontend/app/ask/page.tsx`:
-```tsx
-'use client'
 
-import { useState } from 'react'
-import { api } from '@/lib/api'
-import { QueryInput } from '@/components/ask/QueryInput'
-import { ExampleCards } from '@/components/ask/ExampleCards'
-import { AnswerCard } from '@/components/ask/AnswerCard'
-import { EvidenceAccordion } from '@/components/ask/EvidenceAccordion'
-import type { QueryMode, QueryResponse, CompareResponse } from '@/lib/types'
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { api } from '@/lib/api';
+import { QueryInput } from '@/components/ask/QueryInput';
+import { ExampleCards } from '@/components/ask/ExampleCards';
+import { AnswerCard } from '@/components/ask/AnswerCard';
+import { EvidenceAccordion } from '@/components/ask/EvidenceAccordion';
+import type { QueryMode, QueryResponse, CompareResponse } from '@/lib/types';
 
 export default function AskPage() {
-  const [question, setQuestion] = useState('')
-  const [mode, setMode] = useState<QueryMode | 'compare'>('graph')
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<QueryResponse | null>(null)
-  const [compare, setCompare] = useState<CompareResponse | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [question, setQuestion] = useState('');
+  const [mode, setMode] = useState<QueryMode | 'compare'>('graph');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<QueryResponse | null>(null);
+  const [compare, setCompare] = useState<CompareResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (!question.trim()) return
-    setLoading(true)
-    setError(null)
-    setResult(null)
-    setCompare(null)
+    if (!question.trim()) return;
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    setCompare(null);
     try {
       if (mode === 'compare') {
-        setCompare(await api.compare(question))
+        setCompare(await api.compare(question));
       } else {
-        setResult(await api.query(question, mode))
+        setResult(await api.query(question, mode));
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Unknown error')
+      setError(e instanceof Error ? e.message : 'Unknown error');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 md:px-8">
@@ -1002,11 +1141,15 @@ export default function AskPage() {
         {compare && (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Smart Mode</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Smart Mode
+              </p>
               <AnswerCard result={compare.graph} />
             </div>
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Basic Mode</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Basic Mode
+              </p>
               <AnswerCard result={compare.naive} />
             </div>
           </div>
@@ -1016,16 +1159,17 @@ export default function AskPage() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Example Questions
             </p>
-            <ExampleCards onSelect={q => setQuestion(q)} />
+            <ExampleCards onSelect={(q) => setQuestion(q)} />
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 4: Commit**
+
 ```bash
 git add frontend/
 git commit -m "feat: AnswerCard, EvidenceAccordion, Ask page API wiring"
@@ -1038,43 +1182,48 @@ git commit -m "feat: AnswerCard, EvidenceAccordion, Ask page API wiring"
 ### Task 6: LoadingStages component
 
 **Files:**
+
 - Create: `frontend/components/ask/LoadingStages.tsx`
 - Modify: `frontend/app/ask/page.tsx` (show stages while loading)
 
 - [ ] **Step 1: Create LoadingStages**
 
 Create `frontend/components/ask/LoadingStages.tsx`:
-```tsx
-'use client'
 
-import { useEffect, useState } from 'react'
-import { Check, Loader2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+```tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Check, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const STAGES = [
   { id: 'retrieve', label: 'Retrieving relevant chunks' },
   { id: 'rerank', label: 'Reranking with flashrank' },
   { id: 'synthesize', label: 'Synthesizing answer' },
   { id: 'done', label: 'Done' },
-]
+];
 
 interface LoadingStagesProps {
-  active: boolean
+  active: boolean;
 }
 
 export function LoadingStages({ active }: LoadingStagesProps) {
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    if (!active) { setCurrent(0); return }
-    const timings = [800, 1600, 2800]
+    if (!active) {
+      setCurrent(0);
+      return;
+    }
+    const timings = [800, 1600, 2800];
     const timers = timings.map((t, i) =>
-      setTimeout(() => setCurrent(i + 1), t),
-    )
-    return () => timers.forEach(clearTimeout)
-  }, [active])
+      setTimeout(() => setCurrent(i + 1), t)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, [active]);
 
-  if (!active) return null
+  if (!active) return null;
 
   return (
     <div className="rounded-xl border border-border bg-card px-6 py-5 space-y-3">
@@ -1085,7 +1234,7 @@ export function LoadingStages({ active }: LoadingStagesProps) {
             'flex items-center gap-3 text-sm transition-colors',
             i < current && 'text-chart-2',
             i === current && 'text-foreground',
-            i > current && 'text-muted-foreground/40',
+            i > current && 'text-muted-foreground/40'
           )}
         >
           <div className="w-5 flex justify-center">
@@ -1101,21 +1250,23 @@ export function LoadingStages({ active }: LoadingStagesProps) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 2: Add LoadingStages to Ask page**
 
 In `frontend/app/ask/page.tsx`, add import and render:
+
 ```tsx
-import { LoadingStages } from '@/components/ask/LoadingStages'
+import { LoadingStages } from '@/components/ask/LoadingStages';
 
 // In JSX, between QueryInput and results:
-<LoadingStages active={loading} />
+<LoadingStages active={loading} />;
 ```
 
 - [ ] **Step 3: Commit**
+
 ```bash
 git add frontend/
 git commit -m "feat: LoadingStages component with animated retrieval progress"
@@ -1126,6 +1277,7 @@ git commit -m "feat: LoadingStages component with animated retrieval progress"
 ### Task 7: QueryHistory sidebar panel
 
 **Files:**
+
 - Create: `frontend/hooks/useQueryHistory.ts`
 - Create: `frontend/components/ask/QueryHistory.tsx`
 - Modify: `frontend/app/ask/page.tsx` (integrate history)
@@ -1133,61 +1285,70 @@ git commit -m "feat: LoadingStages component with animated retrieval progress"
 - [ ] **Step 1: Create useQueryHistory hook**
 
 Create `frontend/hooks/useQueryHistory.ts`:
-```ts
-'use client'
 
-import { useState, useCallback } from 'react'
-import type { QueryResponse } from '@/lib/types'
+```ts
+'use client';
+
+import { useState, useCallback } from 'react';
+import type { QueryResponse } from '@/lib/types';
 
 export interface HistoryEntry {
-  id: string
-  question: string
-  mode: string
-  answer: string
-  timestamp: number
+  id: string;
+  question: string;
+  mode: string;
+  answer: string;
+  timestamp: number;
 }
 
-const MAX = 20
+const MAX = 20;
 
 export function useQueryHistory() {
-  const [history, setHistory] = useState<HistoryEntry[]>([])
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
 
-  const push = useCallback((question: string, mode: string, result: QueryResponse) => {
-    const entry: HistoryEntry = {
-      id: `${Date.now()}`,
-      question,
-      mode,
-      answer: result.answer.slice(0, 120),
-      timestamp: Date.now(),
-    }
-    setHistory(prev => [entry, ...prev].slice(0, MAX))
-  }, [])
+  const push = useCallback(
+    (question: string, mode: string, result: QueryResponse) => {
+      const entry: HistoryEntry = {
+        id: `${Date.now()}`,
+        question,
+        mode,
+        answer: result.answer.slice(0, 120),
+        timestamp: Date.now(),
+      };
+      setHistory((prev) => [entry, ...prev].slice(0, MAX));
+    },
+    []
+  );
 
-  const clear = useCallback(() => setHistory([]), [])
+  const clear = useCallback(() => setHistory([]), []);
 
-  return { history, push, clear }
+  return { history, push, clear };
 }
 ```
 
 - [ ] **Step 2: Create QueryHistory panel**
 
 Create `frontend/components/ask/QueryHistory.tsx`:
-```tsx
-'use client'
 
-import { Clock, Trash2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import type { HistoryEntry } from '@/hooks/useQueryHistory'
+```tsx
+'use client';
+
+import { Clock, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import type { HistoryEntry } from '@/hooks/useQueryHistory';
 
 interface QueryHistoryProps {
-  history: HistoryEntry[]
-  onSelect: (q: string) => void
-  onClear: () => void
+  history: HistoryEntry[];
+  onSelect: (q: string) => void;
+  onClear: () => void;
 }
 
-export function QueryHistory({ history, onSelect, onClear }: QueryHistoryProps) {
-  if (!history.length) return null
+export function QueryHistory({
+  history,
+  onSelect,
+  onClear,
+}: QueryHistoryProps) {
+  if (!history.length) return null;
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <div className="mb-3 flex items-center justify-between">
@@ -1195,32 +1356,42 @@ export function QueryHistory({ history, onSelect, onClear }: QueryHistoryProps) 
           <Clock className="h-3.5 w-3.5" />
           Recent Queries
         </div>
-        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onClear}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6"
+          onClick={onClear}
+        >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>
       </div>
       <ScrollArea className="max-h-48">
         <div className="space-y-1">
-          {history.map(entry => (
+          {history.map((entry) => (
             <button
               key={entry.id}
               onClick={() => onSelect(entry.question)}
               className="w-full rounded-lg px-3 py-2.5 text-left text-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <p className="font-medium text-foreground line-clamp-1">{entry.question}</p>
-              <p className="mt-0.5 text-muted-foreground line-clamp-1">{entry.answer}</p>
+              <p className="font-medium text-foreground line-clamp-1">
+                {entry.question}
+              </p>
+              <p className="mt-0.5 text-muted-foreground line-clamp-1">
+                {entry.answer}
+              </p>
             </button>
           ))}
         </div>
       </ScrollArea>
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 3: Wire history into Ask page**
 
 In `frontend/app/ask/page.tsx`, add:
+
 ```tsx
 import { useQueryHistory } from '@/hooks/useQueryHistory'
 import { QueryHistory } from '@/components/ask/QueryHistory'
@@ -1236,6 +1407,7 @@ push(question, mode, data)
 ```
 
 - [ ] **Step 4: Commit**
+
 ```bash
 git add frontend/
 git commit -m "feat: QueryHistory panel with useQueryHistory hook"
@@ -1248,35 +1420,45 @@ git commit -m "feat: QueryHistory panel with useQueryHistory hook"
 ### Task 8: TrendCard with recharts
 
 **Files:**
+
 - Create: `frontend/components/ask/TrendCard.tsx`
 - Modify: `frontend/app/ask/page.tsx` (render TrendCard for trend answers)
 
 - [ ] **Step 1: Create TrendCard**
 
 Create `frontend/components/ask/TrendCard.tsx`:
-```tsx
-'use client'
 
-import { useState } from 'react'
+```tsx
+'use client';
+
+import { useState } from 'react';
 import {
-  LineChart, BarChart, Line, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend,
-} from 'recharts'
-import { Button } from '@/components/ui/button'
-import type { StructuredAnswer } from '@/lib/types'
+  LineChart,
+  BarChart,
+  Line,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
+import { Button } from '@/components/ui/button';
+import type { StructuredAnswer } from '@/lib/types';
 
 interface TrendCardProps {
-  structured: StructuredAnswer
+  structured: StructuredAnswer;
 }
 
 export function TrendCard({ structured }: TrendCardProps) {
-  const [chartType, setChartType] = useState<'line' | 'bar'>('line')
-  if (!structured.series.length) return null
+  const [chartType, setChartType] = useState<'line' | 'bar'>('line');
+  if (!structured.series.length) return null;
 
-  const data = structured.series.map(d => ({
+  const data = structured.series.map((d) => ({
     year: String(d.year),
     value: d.value,
-  }))
+  }));
 
   return (
     <div className="rounded-xl border border-border bg-card p-5">
@@ -1285,7 +1467,7 @@ export function TrendCard({ structured }: TrendCardProps) {
           Trend — {structured.metric ?? 'Value'} ({structured.unit ?? ''})
         </p>
         <div className="flex gap-1">
-          {(['line', 'bar'] as const).map(t => (
+          {(['line', 'bar'] as const).map((t) => (
             <Button
               key={t}
               variant={chartType === t ? 'default' : 'ghost'}
@@ -1302,55 +1484,97 @@ export function TrendCard({ structured }: TrendCardProps) {
         <ResponsiveContainer width="100%" height="100%">
           {chartType === 'line' ? (
             <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
-              <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(var(--border))"
+              />
+              <XAxis
+                dataKey="year"
+                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+              />
               <Tooltip
-                contentStyle={{ background: 'hsl(var(--popover))', border: '1px solid hsl(var(--border))', borderRadius: 8 }}
+                contentStyle={{
+                  background: 'hsl(var(--popover))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: 8,
+                }}
                 labelStyle={{ color: 'hsl(var(--foreground))' }}
               />
-              <Line type="monotone" dataKey="value" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={{ r: 4 }} />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="hsl(var(--chart-1))"
+                strokeWidth={2}
+                dot={{ r: 4 }}
+              />
             </LineChart>
           ) : (
             <BarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
-              <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(var(--border))"
+              />
+              <XAxis
+                dataKey="year"
+                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+              />
               <Tooltip
-                contentStyle={{ background: 'hsl(var(--popover))', border: '1px solid hsl(var(--border))', borderRadius: 8 }}
+                contentStyle={{
+                  background: 'hsl(var(--popover))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: 8,
+                }}
                 labelStyle={{ color: 'hsl(var(--foreground))' }}
               />
-              <Bar dataKey="value" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
+              <Bar
+                dataKey="value"
+                fill="hsl(var(--chart-1))"
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           )}
         </ResponsiveContainer>
       </div>
       <div className="mt-3 flex gap-2 overflow-x-auto">
-        {structured.series.map(d => (
-          <div key={d.year} className="shrink-0 rounded-lg border border-border bg-muted/50 px-3 py-2 text-center">
+        {structured.series.map((d) => (
+          <div
+            key={d.year}
+            className="shrink-0 rounded-lg border border-border bg-muted/50 px-3 py-2 text-center"
+          >
             <p className="text-[10px] text-muted-foreground">{d.year}</p>
             <p className="text-sm font-bold">{d.value.toLocaleString()}</p>
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 2: Add TrendCard to Ask page**
 
 In `frontend/app/ask/page.tsx`, after AnswerCard:
+
 ```tsx
-import { TrendCard } from '@/components/ask/TrendCard'
+import { TrendCard } from '@/components/ask/TrendCard';
 
 // In JSX, after <AnswerCard result={result} />:
-{result.structured?.kind === 'trend' && result.structured.series.length > 0 && (
-  <TrendCard structured={result.structured} />
-)}
+{
+  result.structured?.kind === 'trend' &&
+    result.structured.series.length > 0 && (
+      <TrendCard structured={result.structured} />
+    );
+}
 ```
 
 - [ ] **Step 3: Commit**
+
 ```bash
 git add frontend/
 git commit -m "feat: TrendCard with recharts line/bar toggle"
@@ -1361,6 +1585,7 @@ git commit -m "feat: TrendCard with recharts line/bar toggle"
 ### Task 9: Benchmark tab
 
 **Files:**
+
 - Create: `frontend/components/benchmark/StatsGrid.tsx`
 - Create: `frontend/components/benchmark/BenchmarkTable.tsx`
 - Create: `frontend/components/benchmark/RadarChart.tsx`
@@ -1369,70 +1594,106 @@ git commit -m "feat: TrendCard with recharts line/bar toggle"
 - [ ] **Step 1: Create StatsGrid**
 
 Create `frontend/components/benchmark/StatsGrid.tsx`:
+
 ```tsx
 interface StatCardProps {
-  label: string
-  structured: number
-  naive: number
+  label: string;
+  structured: number;
+  naive: number;
 }
 
 function StatCard({ label, structured, naive }: StatCardProps) {
-  const delta = Math.round((structured - naive) * 100)
+  const delta = Math.round((structured - naive) * 100);
   return (
     <div className="rounded-xl border border-border bg-card p-5">
-      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        {label}
+      </p>
       <p className="mt-2 text-4xl font-extrabold tracking-tight text-chart-2">
         {Math.round(structured * 100)}%
       </p>
       <p className="mt-1 text-xs text-muted-foreground">
         Naive: {Math.round(naive * 100)}%
-        <span className={`ml-2 font-semibold ${delta >= 0 ? 'text-chart-2' : 'text-destructive'}`}>
-          {delta >= 0 ? '+' : ''}{delta}pp
+        <span
+          className={`ml-2 font-semibold ${delta >= 0 ? 'text-chart-2' : 'text-destructive'}`}
+        >
+          {delta >= 0 ? '+' : ''}
+          {delta}pp
         </span>
       </p>
     </div>
-  )
+  );
 }
 
 interface StatsGridProps {
   summary: {
-    structured: { TRA: number; ACS: number; CYC: number }
-    naive: { TRA: number; ACS: number; CYC: number }
-  }
+    structured: { TRA: number; ACS: number; CYC: number };
+    naive: { TRA: number; ACS: number; CYC: number };
+  };
 }
 
 export function StatsGrid({ summary }: StatsGridProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <StatCard label="Table Retrieval (TRA)" structured={summary.structured.TRA} naive={summary.naive.TRA} />
-      <StatCard label="Answer Correctness (ACS)" structured={summary.structured.ACS} naive={summary.naive.ACS} />
-      <StatCard label="Cross-Year Coherence (CYC)" structured={summary.structured.CYC} naive={summary.naive.CYC} />
+      <StatCard
+        label="Table Retrieval (TRA)"
+        structured={summary.structured.TRA}
+        naive={summary.naive.TRA}
+      />
+      <StatCard
+        label="Answer Correctness (ACS)"
+        structured={summary.structured.ACS}
+        naive={summary.naive.ACS}
+      />
+      <StatCard
+        label="Cross-Year Coherence (CYC)"
+        structured={summary.structured.CYC}
+        naive={summary.naive.CYC}
+      />
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 2: Create RadarChartCard**
 
 Create `frontend/components/benchmark/RadarChart.tsx`:
+
 ```tsx
-'use client'
+'use client';
 
 import {
-  Radar, RadarChart, PolarGrid, PolarAngleAxis, Legend, ResponsiveContainer,
-} from 'recharts'
-import type { BenchmarkResultResponse } from '@/lib/types'
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
+import type { BenchmarkResultResponse } from '@/lib/types';
 
 interface RadarChartCardProps {
-  summary: BenchmarkResultResponse['summary']
+  summary: BenchmarkResultResponse['summary'];
 }
 
 export function RadarChartCard({ summary }: RadarChartCardProps) {
   const data = [
-    { metric: 'TRA', structured: summary.structured.TRA * 100, naive: summary.naive.TRA * 100 },
-    { metric: 'ACS', structured: summary.structured.ACS * 100, naive: summary.naive.ACS * 100 },
-    { metric: 'CYC', structured: summary.structured.CYC * 100, naive: summary.naive.CYC * 100 },
-  ]
+    {
+      metric: 'TRA',
+      structured: summary.structured.TRA * 100,
+      naive: summary.naive.TRA * 100,
+    },
+    {
+      metric: 'ACS',
+      structured: summary.structured.ACS * 100,
+      naive: summary.naive.ACS * 100,
+    },
+    {
+      metric: 'CYC',
+      structured: summary.structured.CYC * 100,
+      naive: summary.naive.CYC * 100,
+    },
+  ];
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
@@ -1442,27 +1703,43 @@ export function RadarChartCard({ summary }: RadarChartCardProps) {
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={data}>
             <PolarGrid stroke="hsl(var(--border))" />
-            <PolarAngleAxis dataKey="metric" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
-            <Radar name="Structured" dataKey="structured" stroke="hsl(var(--chart-1))" fill="hsl(var(--chart-1))" fillOpacity={0.25} />
-            <Radar name="Naive" dataKey="naive" stroke="hsl(var(--chart-3))" fill="hsl(var(--chart-3))" fillOpacity={0.15} />
+            <PolarAngleAxis
+              dataKey="metric"
+              tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+            />
+            <Radar
+              name="Structured"
+              dataKey="structured"
+              stroke="hsl(var(--chart-1))"
+              fill="hsl(var(--chart-1))"
+              fillOpacity={0.25}
+            />
+            <Radar
+              name="Naive"
+              dataKey="naive"
+              stroke="hsl(var(--chart-3))"
+              fill="hsl(var(--chart-3))"
+              fillOpacity={0.15}
+            />
             <Legend wrapperStyle={{ fontSize: 11 }} />
           </RadarChart>
         </ResponsiveContainer>
       </div>
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 3: Create BenchmarkTable**
 
 Create `frontend/components/benchmark/BenchmarkTable.tsx`:
+
 ```tsx
-import { Badge } from '@/components/ui/badge'
-import type { BenchmarkResult } from '@/lib/types'
+import { Badge } from '@/components/ui/badge';
+import type { BenchmarkResult } from '@/lib/types';
 
 interface BenchmarkTableProps {
-  results: BenchmarkResult[]
+  results: BenchmarkResult[];
 }
 
 export function BenchmarkTable({ results }: BenchmarkTableProps) {
@@ -1471,104 +1748,148 @@ export function BenchmarkTable({ results }: BenchmarkTableProps) {
       <table className="w-full text-xs">
         <thead>
           <tr className="border-b border-border bg-muted/50">
-            <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider text-muted-foreground">#</th>
-            <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider text-muted-foreground">Question</th>
-            <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider text-muted-foreground">Type</th>
-            <th className="px-4 py-3 text-center font-semibold uppercase tracking-wider text-muted-foreground">TRA</th>
-            <th className="px-4 py-3 text-center font-semibold uppercase tracking-wider text-muted-foreground">ACS</th>
+            <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider text-muted-foreground">
+              #
+            </th>
+            <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider text-muted-foreground">
+              Question
+            </th>
+            <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider text-muted-foreground">
+              Type
+            </th>
+            <th className="px-4 py-3 text-center font-semibold uppercase tracking-wider text-muted-foreground">
+              TRA
+            </th>
+            <th className="px-4 py-3 text-center font-semibold uppercase tracking-wider text-muted-foreground">
+              ACS
+            </th>
           </tr>
         </thead>
         <tbody>
           {results.map((r, i) => (
-            <tr key={r.question_id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+            <tr
+              key={r.question_id}
+              className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
+            >
               <td className="px-4 py-3 text-muted-foreground">{i + 1}</td>
               <td className="px-4 py-3 max-w-xs">
                 <p className="text-foreground">{r.question}</p>
               </td>
               <td className="px-4 py-3">
-                <Badge variant="outline" className="text-[10px]">{r.question_type}</Badge>
+                <Badge variant="outline" className="text-[10px]">
+                  {r.question_type}
+                </Badge>
               </td>
               <td className="px-4 py-3 text-center">
-                <span className={r.tra_graph ? 'font-bold text-chart-2' : 'text-destructive'}>
+                <span
+                  className={
+                    r.tra_graph ? 'font-bold text-chart-2' : 'text-destructive'
+                  }
+                >
                   {r.tra_graph ? '✓' : '✗'}
                 </span>
               </td>
               <td className="px-4 py-3 text-center text-muted-foreground">
-                {r.acs_graph != null ? `${Math.round(r.acs_graph * 100)}%` : '—'}
+                {r.acs_graph != null
+                  ? `${Math.round(r.acs_graph * 100)}%`
+                  : '—'}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 4: Create Benchmark page**
 
 Create `frontend/app/benchmark/page.tsx`:
-```tsx
-'use client'
 
-import { useEffect, useState } from 'react'
-import { api } from '@/lib/api'
-import { StatsGrid } from '@/components/benchmark/StatsGrid'
-import { RadarChartCard } from '@/components/benchmark/RadarChart'
-import { BenchmarkTable } from '@/components/benchmark/BenchmarkTable'
-import { Button } from '@/components/ui/button'
-import type { BenchmarkResultResponse } from '@/lib/types'
+```tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import { api } from '@/lib/api';
+import { StatsGrid } from '@/components/benchmark/StatsGrid';
+import { RadarChartCard } from '@/components/benchmark/RadarChart';
+import { BenchmarkTable } from '@/components/benchmark/BenchmarkTable';
+import { Button } from '@/components/ui/button';
+import type { BenchmarkResultResponse } from '@/lib/types';
 
 export default function BenchmarkPage() {
-  const [data, setData] = useState<BenchmarkResultResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [running, setRunning] = useState(false)
+  const [data, setData] = useState<BenchmarkResultResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    api.benchmarkResults().then(setData).catch(console.error).finally(() => setLoading(false))
-  }, [])
+    api
+      .benchmarkResults()
+      .then(setData)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleRun = async () => {
-    setRunning(true)
+    setRunning(true);
     try {
-      await api.runBenchmark()
-      const fresh = await api.benchmarkResults()
-      setData(fresh)
+      await api.runBenchmark();
+      const fresh = await api.benchmarkResults();
+      setData(fresh);
     } catch (e) {
-      console.error(e)
+      console.error(e);
     } finally {
-      setRunning(false)
+      setRunning(false);
     }
-  }
+  };
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 md:px-8">
       <div className="mb-8 flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Benchmark Results</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Benchmark Results
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Structured GraphRAG vs naive vector retrieval across 10 questions
           </p>
         </div>
-        <Button onClick={handleRun} disabled={running} size="sm" variant="outline">
+        <Button
+          onClick={handleRun}
+          disabled={running}
+          size="sm"
+          variant="outline"
+        >
           {running ? 'Running…' : 'Re-run Benchmark'}
         </Button>
       </div>
-      {loading && <p className="text-sm text-muted-foreground">Loading results…</p>}
+      {loading && (
+        <p className="text-sm text-muted-foreground">Loading results…</p>
+      )}
       {data && (
         <div className="space-y-6">
           <StatsGrid summary={data.summary} />
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <RadarChartCard summary={data.summary} />
             <div className="rounded-xl border border-border bg-card p-5">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">About</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                About
+              </p>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                <strong className="text-foreground">TRA</strong> — Table Retrieval Accuracy: did retrieved chunks contain the expected Markdown table row?<br />
-                <strong className="text-foreground">ACS</strong> — Answer Correctness Score: numeric answer within 5% of expected?<br />
-                <strong className="text-foreground">CYC</strong> — Cross-Year Coherence: does the answer mention all required years?
+                <strong className="text-foreground">TRA</strong> — Table
+                Retrieval Accuracy: did retrieved chunks contain the expected
+                Markdown table row?
+                <br />
+                <strong className="text-foreground">ACS</strong> — Answer
+                Correctness Score: numeric answer within 5% of expected?
+                <br />
+                <strong className="text-foreground">CYC</strong> — Cross-Year
+                Coherence: does the answer mention all required years?
               </p>
               <p className="mt-3 text-xs text-muted-foreground">
-                Generated: {data.generated_at} · {data.total_questions} questions
+                Generated: {data.generated_at} · {data.total_questions}{' '}
+                questions
               </p>
             </div>
           </div>
@@ -1576,11 +1897,12 @@ export default function BenchmarkPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 5: Commit**
+
 ```bash
 git add frontend/
 git commit -m "feat: Benchmark tab with StatsGrid, RadarChart, BenchmarkTable"
@@ -1591,6 +1913,7 @@ git commit -m "feat: Benchmark tab with StatsGrid, RadarChart, BenchmarkTable"
 ### Task 10: Pipeline tab
 
 **Files:**
+
 - Create: `frontend/components/pipeline/DataStatusGrid.tsx`
 - Create: `frontend/components/pipeline/PipelineTriggers.tsx`
 - Create: `frontend/app/pipeline/page.tsx`
@@ -1598,91 +1921,121 @@ git commit -m "feat: Benchmark tab with StatsGrid, RadarChart, BenchmarkTable"
 - [ ] **Step 1: Create DataStatusGrid**
 
 Create `frontend/components/pipeline/DataStatusGrid.tsx`:
+
 ```tsx
-import type { DataStatusResponse } from '@/lib/types'
-import { cn } from '@/lib/utils'
+import type { DataStatusResponse } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
 interface DataStatusGridProps {
-  status: DataStatusResponse
+  status: DataStatusResponse;
 }
 
-const ALL_YEARS = [2021, 2022, 2023, 2024]
+const ALL_YEARS = [2021, 2022, 2023, 2024];
 
 export function DataStatusGrid({ status }: DataStatusGridProps) {
-  const tickers = Object.keys(status.downloaded)
+  const tickers = Object.keys(status.downloaded);
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {tickers.map(ticker => (
-        <div key={ticker} className="rounded-xl border border-border bg-card p-4">
+      {tickers.map((ticker) => (
+        <div
+          key={ticker}
+          className="rounded-xl border border-border bg-card p-4"
+        >
           <p className="mb-3 text-base font-bold">{ticker}</p>
           <div className="flex flex-wrap gap-2">
-            {ALL_YEARS.map(yr => {
-              const downloaded = status.downloaded[ticker]?.includes(yr)
-              const parsed = status.parsed[ticker]?.includes(yr)
+            {ALL_YEARS.map((yr) => {
+              const downloaded = status.downloaded[ticker]?.includes(yr);
+              const parsed = status.parsed[ticker]?.includes(yr);
               return (
-                <div key={yr} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <div
+                  key={yr}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground"
+                >
                   <span
-                    className={cn('h-2 w-2 rounded-full', parsed ? 'bg-chart-2' : downloaded ? 'bg-chart-3' : 'bg-muted')}
+                    className={cn(
+                      'h-2 w-2 rounded-full',
+                      parsed
+                        ? 'bg-chart-2'
+                        : downloaded
+                          ? 'bg-chart-3'
+                          : 'bg-muted'
+                    )}
                   />
                   {yr}
                 </div>
-              )
+              );
             })}
           </div>
           <p className="mt-2 text-[10px] text-muted-foreground">
-            <span className="inline-flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-chart-2 inline-block" /> Parsed</span>
+            <span className="inline-flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-chart-2 inline-block" />{' '}
+              Parsed
+            </span>
             {' · '}
-            <span className="inline-flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-chart-3 inline-block" /> Downloaded</span>
+            <span className="inline-flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-chart-3 inline-block" />{' '}
+              Downloaded
+            </span>
             {' · '}
-            <span className="inline-flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-muted inline-block" /> Missing</span>
+            <span className="inline-flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-muted inline-block" />{' '}
+              Missing
+            </span>
           </p>
         </div>
       ))}
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 2: Create PipelineTriggers**
 
 Create `frontend/components/pipeline/PipelineTriggers.tsx`:
-```tsx
-'use client'
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { api } from '@/lib/api'
-import type { PipelineStatusResponse } from '@/lib/types'
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { api } from '@/lib/api';
+import type { PipelineStatusResponse } from '@/lib/types';
 
 interface TriggerButtonProps {
-  label: string
-  action: () => Promise<PipelineStatusResponse>
-  onDone: () => void
+  label: string;
+  action: () => Promise<PipelineStatusResponse>;
+  onDone: () => void;
 }
 
 function TriggerButton({ label, action, onDone }: TriggerButtonProps) {
-  const [status, setStatus] = useState<PipelineStatusResponse | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState<PipelineStatusResponse | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const run = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await action()
-      setStatus(res)
+      const res = await action();
+      setStatus(res);
       // poll until done
-      let current = res
+      let current = res;
       while (current.progress < 100 && current.stage !== 'error') {
-        await new Promise(r => setTimeout(r, 2000))
-        current = await api.pollStatus(current.job_id)
-        setStatus(current)
+        await new Promise((r) => setTimeout(r, 2000));
+        current = await api.pollStatus(current.job_id);
+        setStatus(current);
       }
-      onDone()
+      onDone();
     } catch (e) {
-      setStatus({ job_id: '', stage: 'error', progress: 0, message: String(e), errors: [] })
+      setStatus({
+        job_id: '',
+        stage: 'error',
+        progress: 0,
+        message: String(e),
+        errors: [],
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
@@ -1702,51 +2055,76 @@ function TriggerButton({ label, action, onDone }: TriggerButtonProps) {
           </div>
           <p className="mt-2 text-xs text-muted-foreground">{status.message}</p>
           {status.errors.length > 0 && (
-            <p className="mt-1 text-xs text-destructive">{status.errors.join(', ')}</p>
+            <p className="mt-1 text-xs text-destructive">
+              {status.errors.join(', ')}
+            </p>
           )}
         </>
       )}
     </div>
-  )
+  );
 }
 
 interface PipelineTriggersProps {
-  onStatusChange: () => void
+  onStatusChange: () => void;
 }
 
 export function PipelineTriggers({ onStatusChange }: PipelineTriggersProps) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      <TriggerButton label="1. Download Filings" action={() => api.download()} onDone={onStatusChange} />
-      <TriggerButton label="2. Parse with LlamaParse" action={() => api.parse()} onDone={onStatusChange} />
-      <TriggerButton label="3. Build Index" action={() => api.buildIndex()} onDone={onStatusChange} />
-      <TriggerButton label="4. Run Benchmark" action={() => api.runBenchmark()} onDone={onStatusChange} />
+      <TriggerButton
+        label="1. Download Filings"
+        action={() => api.download()}
+        onDone={onStatusChange}
+      />
+      <TriggerButton
+        label="2. Parse with LlamaParse"
+        action={() => api.parse()}
+        onDone={onStatusChange}
+      />
+      <TriggerButton
+        label="3. Build Index"
+        action={() => api.buildIndex()}
+        onDone={onStatusChange}
+      />
+      <TriggerButton
+        label="4. Run Benchmark"
+        action={() => api.runBenchmark()}
+        onDone={onStatusChange}
+      />
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 3: Create Pipeline page**
 
 Create `frontend/app/pipeline/page.tsx`:
-```tsx
-'use client'
 
-import { useEffect, useState, useCallback } from 'react'
-import { api } from '@/lib/api'
-import { DataStatusGrid } from '@/components/pipeline/DataStatusGrid'
-import { PipelineTriggers } from '@/components/pipeline/PipelineTriggers'
-import type { DataStatusResponse } from '@/lib/types'
+```tsx
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
+import { api } from '@/lib/api';
+import { DataStatusGrid } from '@/components/pipeline/DataStatusGrid';
+import { PipelineTriggers } from '@/components/pipeline/PipelineTriggers';
+import type { DataStatusResponse } from '@/lib/types';
 
 export default function PipelinePage() {
-  const [status, setStatus] = useState<DataStatusResponse | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [status, setStatus] = useState<DataStatusResponse | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(() => {
-    api.dataStatus().then(setStatus).catch(console.error).finally(() => setLoading(false))
-  }, [])
+    api
+      .dataStatus()
+      .then(setStatus)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
-  useEffect(() => { refresh() }, [refresh])
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 md:px-8">
@@ -1758,21 +2136,26 @@ export default function PipelinePage() {
       </div>
       <div className="space-y-6">
         <div>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Pipeline Steps</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Pipeline Steps
+          </p>
           <PipelineTriggers onStatusChange={refresh} />
         </div>
         <div>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Data Status</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Data Status
+          </p>
           {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
           {status && <DataStatusGrid status={status} />}
         </div>
       </div>
     </div>
-  )
+  );
 }
 ```
 
 - [ ] **Step 4: Commit**
+
 ```bash
 git add frontend/
 git commit -m "feat: Pipeline tab with DataStatusGrid and PipelineTriggers"
@@ -1785,6 +2168,7 @@ git commit -m "feat: Pipeline tab with DataStatusGrid and PipelineTriggers"
 ### Task 11: Mobile audit + responsive fixes
 
 **Files:**
+
 - Modify: `frontend/components/layout/AppShell.tsx`
 - Modify: `frontend/components/layout/Sidebar.tsx`
 - Modify: `frontend/app/ask/page.tsx`
@@ -1798,6 +2182,7 @@ Start dev server: `cd frontend && npm run dev`
 Open DevTools → Toggle device toolbar → set to 375px wide.
 
 Check each tab for:
+
 - Sidebar hidden, hamburger visible
 - No horizontal scroll
 - Cards stack vertically
@@ -1806,6 +2191,7 @@ Check each tab for:
 - [ ] **Step 2: Fix any overflow issues**
 
 In each page file, ensure all grid containers use:
+
 ```tsx
 // Replace any fixed-width grid with responsive:
 // Before: grid-cols-2
@@ -1819,6 +2205,7 @@ In each page file, ensure all grid containers use:
 - [ ] **Step 3: Fix chart heights on mobile**
 
 In `TrendCard.tsx` and `RadarChart.tsx`, replace fixed `h-56` with responsive height:
+
 ```tsx
 // Replace: <div className="h-56">
 // With:
@@ -1828,12 +2215,11 @@ In `TrendCard.tsx` and `RadarChart.tsx`, replace fixed `h-56` with responsive he
 - [ ] **Step 4: Fix benchmark table on mobile**
 
 In `BenchmarkTable.tsx`, make table horizontally scrollable:
+
 ```tsx
 // Wrap table in:
 <div className="overflow-x-auto">
-  <table className="w-full min-w-[600px] text-xs">
-    ...
-  </table>
+  <table className="w-full min-w-[600px] text-xs">...</table>
 </div>
 ```
 
@@ -1842,6 +2228,7 @@ In `BenchmarkTable.tsx`, make table horizontally scrollable:
 Verify at each breakpoint: no overflow, no overlapping elements, buttons are tappable (min 44px target).
 
 - [ ] **Step 6: Commit**
+
 ```bash
 git add frontend/
 git commit -m "fix: mobile responsive — collapsible sidebar, responsive grids, scrollable tables"
@@ -1854,6 +2241,7 @@ git commit -m "fix: mobile responsive — collapsible sidebar, responsive grids,
 ### Task 12: Frontend code review
 
 The code reviewer agent reads `.claude/rules/frontend.md` and checks:
+
 - shadcn/ui only (no raw HTML form elements)
 - Tailwind classes only (no inline styles)
 - Mobile-first (base 375px)
@@ -1870,10 +2258,12 @@ Reviewer produces a list of findings. Orchestrator dispatches fixes back to fron
 ### Task 13: Git init + GitHub push
 
 **Files:**
+
 - Create/Modify: `.gitignore`
 - Create: `vercel.json`
 
 - [ ] **Step 1: Init git repo**
+
 ```bash
 cd "D:\0001-Full Time\Projects\sec_analyzer"
 git init
@@ -1883,6 +2273,7 @@ git branch -m main
 - [ ] **Step 2: Update .gitignore**
 
 Create `.gitignore`:
+
 ```
 # Python
 venv/
@@ -1907,6 +2298,7 @@ Thumbs.db
 ```
 
 - [ ] **Step 3: Create vercel.json**
+
 ```json
 {
   "buildCommand": "cd frontend && npm install && npm run build",
@@ -1945,26 +2337,32 @@ Open `https://github.com/<user>/sec-analyzer` and confirm `frontend/` directory 
 ### Task 14: Vercel deployment
 
 - [ ] **Step 1: Install Vercel CLI**
+
 ```bash
 npm install -g vercel
 ```
 
 - [ ] **Step 2: Login to Vercel**
+
 ```bash
 vercel login
 ```
 
 - [ ] **Step 3: Deploy from frontend directory**
+
 ```bash
 cd "D:\0001-Full Time\Projects\sec_analyzer"
 vercel --cwd frontend
 ```
+
 When prompted:
+
 - Link to existing project? No
 - Project name: `filingsiq`
 - Root directory: `./` (we're already in frontend)
 
 - [ ] **Step 4: Set environment variables**
+
 ```bash
 vercel env add NEXT_PUBLIC_API_URL production
 # enter: https://sec-filing-analyzer.onrender.com
@@ -1974,20 +2372,24 @@ vercel env add RENDER_API_URL production
 ```
 
 - [ ] **Step 5: Deploy to production**
+
 ```bash
 vercel --prod
 ```
+
 Expected output: `https://filingsiq.vercel.app`
 
 - [ ] **Step 6: Smoke test production**
 
 Open `https://filingsiq.vercel.app/ask` and run:
+
 - Type "What was Apple's revenue in 2023?" → Submit
 - Verify answer renders
 - Open `/benchmark` → verify stats grid shows
 - Open `/pipeline` → verify data status loads
 
 - [ ] **Step 7: Final commit**
+
 ```bash
 git add vercel.json .gitignore
 git commit -m "chore: add vercel.json and .gitignore"

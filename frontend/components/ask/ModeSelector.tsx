@@ -1,18 +1,18 @@
-'use client'
+'use client';
 
-import { Button } from '@/components/ui/button'
-import type { QueryMode } from '@/lib/types'
+import { Button } from '@/components/ui/button';
+import type { QueryMode } from '@/lib/types';
 
 interface ModeSelectorProps {
-  mode: QueryMode | 'compare'
-  onChange: (m: QueryMode | 'compare') => void
+  mode: QueryMode | 'compare';
+  onChange: (m: QueryMode | 'compare') => void;
 }
 
 const MODES: { value: QueryMode | 'compare'; label: string }[] = [
   { value: 'graph', label: 'Smart' },
   { value: 'naive', label: 'Basic' },
   { value: 'compare', label: 'Compare' },
-]
+];
 
 export function ModeSelector({ mode, onChange }: ModeSelectorProps) {
   return (
@@ -29,5 +29,5 @@ export function ModeSelector({ mode, onChange }: ModeSelectorProps) {
         </Button>
       ))}
     </div>
-  )
+  );
 }
