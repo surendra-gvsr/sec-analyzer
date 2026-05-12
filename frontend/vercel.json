@@ -1,6 +1,4 @@
 {
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": ".next",
   "framework": "nextjs",
   "rewrites": [
     {
