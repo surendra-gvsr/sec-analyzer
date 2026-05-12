@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-12T15:27:39.531Z",
+  "timestamp": "2026-05-12T19:21:13.886Z",
   "source": "auto-postool",
   "partial": false,
   "phase": null,
@@ -18,13 +18,65 @@
   "uncommitted_files": [
     {
       "status": "M",
-      "path": ".planning/HANDOFF.json"
+      "path": ".claude/settings.local.json"
     },
     {
       "status": "M",
-      "path": "frontend/.gitignore"
+      "path": ".planning/HANDOFF.json"
+    },
+    {
+      "status": "D",
+      "path": ".vercelignore"
+    },
+    {
+      "status": "M",
+      "path": "index.html"
+    },
+    {
+      "status": "M",
+      "path": "vercel.json"
+    },
+    {
+      "status": "??",
+      "path": ".playwright-mcp/"
+    },
+    {
+      "status": "??",
+      "path": "filingsiq-after-example-click.png"
+    },
+    {
+      "status": "??",
+      "path": "filingsiq-answer-2.png"
+    },
+    {
+      "status": "??",
+      "path": "filingsiq-answer-3.png"
+    },
+    {
+      "status": "??",
+      "path": "filingsiq-answer.png"
+    },
+    {
+      "status": "??",
+      "path": "filingsiq-ask-tab.png"
+    },
+    {
+      "status": "??",
+      "path": "filingsiq-benchmark-2.png"
+    },
+    {
+      "status": "??",
+      "path": "filingsiq-benchmark.png"
+    },
+    {
+      "status": "??",
+      "path": "filingsiq-query-response.png"
+    },
+    {
+      "status": "??",
+      "path": "vercel-deployment-inspect.png"
     }
   ],
   "next_action": null,
-  "context_notes": "Recent commits:\nf3e46bf feat: track frontend as regular directory (fix submodule)\n03bf4f0 feat: add Next.js 14 frontend + tooling setup"
+  "context_notes": "Recent commits:\nb41be8f chore: add .vercelignore to exclude Python venv and data from Vercel upload\nc4d44dd fix: resolve Render cold-start crash-loop and proxy routing\nbabbdee chore: Vercel project linked, .vercel config added\nf3e46bf feat: track frontend as regular directory (fix submodule)\n03bf4f0 feat: add Next.js 14 frontend + tooling setup"
 }

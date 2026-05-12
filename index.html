@@ -1,635 +1,1351 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FilingsIQ — SEC 10-K Intelligence</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <style>
-    :root {
-      --bg: #0b0d13;
-      --surface: #14171f;
-      --surface2: #1c2030;
-      --surface3: #232838;
-      --border: #2a2f42;
-      --border-strong: #3a4060;
-      --accent: #5b8def;
-      --accent-2: #22c55e;
-      --accent-3: #f59e0b;
-      --danger: #ef4444;
-      --text: #e7eaf3;
-      --text-mute: #9aa3bd;
-      --text-dim: #6b7390;
-      --radius: 12px;
-      --radius-lg: 16px;
-      --shadow-1: 0 1px 2px rgba(0,0,0,.2);
-      --shadow-2: 0 4px 16px rgba(0,0,0,.25);
-      --shadow-3: 0 8px 32px rgba(0,0,0,.4);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-    }
-    a { color: var(--accent); text-decoration: none; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FilingsIQ — SEC 10-K Intelligence</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+      :root {
+        --bg: #0b0d13;
+        --surface: #14171f;
+        --surface2: #1c2030;
+        --surface3: #232838;
+        --border: #2a2f42;
+        --border-strong: #3a4060;
+        --accent: #5b8def;
+        --accent-2: #22c55e;
+        --accent-3: #f59e0b;
+        --danger: #ef4444;
+        --text: #e7eaf3;
+        --text-mute: #9aa3bd;
+        --text-dim: #6b7390;
+        --radius: 12px;
+        --radius-lg: 16px;
+        --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.2);
+        --shadow-2: 0 4px 16px rgba(0, 0, 0, 0.25);
+        --shadow-3: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
 
-    /* ─── App Shell ────────────────────────────────────────────────── */
-    .app { display: flex; min-height: 100vh; }
+      /* ─── App Shell ────────────────────────────────────────────────── */
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
 
-    .sidebar {
-      width: 240px; background: var(--surface); border-right: 1px solid var(--border);
-      display: flex; flex-direction: column; flex-shrink: 0;
-    }
-    .sb-brand {
-      padding: 20px 22px 18px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 10px;
-    }
-    .sb-logo {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; color: white; font-size: 14px;
-    }
-    .sb-brand h1 { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
-    .sb-brand p { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+      .sidebar {
+        width: 240px;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+      }
+      .sb-brand {
+        padding: 20px 22px 18px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .sb-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--accent), #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        color: white;
+        font-size: 14px;
+      }
+      .sb-brand h1 {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .sb-brand p {
+        font-size: 11px;
+        color: var(--text-dim);
+        margin-top: 1px;
+      }
 
-    .sb-section { padding: 16px 12px 4px; }
-    .sb-section-title {
-      font-size: 10px; text-transform: uppercase; letter-spacing: .12em;
-      color: var(--text-dim); padding: 0 10px 8px; font-weight: 600;
-    }
-    .sb-nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 12px; border-radius: 8px; cursor: pointer;
-      color: var(--text-mute); font-size: 13px; font-weight: 500;
-      transition: background .12s, color .12s;
-    }
-    .sb-nav-item:hover { background: var(--surface2); color: var(--text); }
-    .sb-nav-item.active {
-      background: var(--surface2); color: var(--text);
-      box-shadow: inset 2px 0 0 var(--accent);
-    }
-    .sb-nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+      .sb-section {
+        padding: 16px 12px 4px;
+      }
+      .sb-section-title {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-dim);
+        padding: 0 10px 8px;
+        font-weight: 600;
+      }
+      .sb-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--text-mute);
+        font-size: 13px;
+        font-weight: 500;
+        transition:
+          background 0.12s,
+          color 0.12s;
+      }
+      .sb-nav-item:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .sb-nav-item.active {
+        background: var(--surface2);
+        color: var(--text);
+        box-shadow: inset 2px 0 0 var(--accent);
+      }
+      .sb-nav-item svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+      }
 
-    .sb-footer {
-      margin-top: auto; padding: 16px 22px;
-      border-top: 1px solid var(--border);
-      font-size: 11px; color: var(--text-dim);
-    }
-    .sb-status { display: flex; align-items: center; gap: 6px; }
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); }
+      .sb-footer {
+        margin-top: auto;
+        padding: 16px 22px;
+        border-top: 1px solid var(--border);
+        font-size: 11px;
+        color: var(--text-dim);
+      }
+      .sb-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent-2);
+      }
 
-    .main {
-      flex: 1; overflow-y: auto; padding: 32px 40px 60px;
-      max-width: 1100px; margin: 0 auto; width: 100%;
-    }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+      .main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 32px 40px 60px;
+        max-width: 1100px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+      }
 
-    /* ─── Page Header ──────────────────────────────────────────────── */
-    .ph {
-      display: flex; justify-content: space-between; align-items: flex-end;
-      margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
-    }
-    .ph h2 { font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
-    .ph p { font-size: 13px; color: var(--text-mute); margin-top: 4px; }
+      /* ─── Page Header ──────────────────────────────────────────────── */
+      .ph {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .ph h2 {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .ph p {
+        font-size: 13px;
+        color: var(--text-mute);
+        margin-top: 4px;
+      }
 
-    /* ─── Cards ────────────────────────────────────────────────────── */
-    .card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 22px; margin-bottom: 18px;
-      box-shadow: var(--shadow-1);
-    }
-    .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .card-title { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: .1em; }
+      /* ─── Cards ────────────────────────────────────────────────────── */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px;
+        margin-bottom: 18px;
+        box-shadow: var(--shadow-1);
+      }
+      .card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+      .card-title {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
 
-    /* ─── Query Input ──────────────────────────────────────────────── */
-    .query-card { padding: 24px; }
-    .query-input {
-      width: 100%; background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text); padding: 16px 18px;
-      font-size: 15px; font-family: inherit; line-height: 1.5;
-      outline: none; transition: border .15s, box-shadow .15s;
-      resize: vertical; min-height: 56px;
-    }
-    .query-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(91,141,239,.15); }
-    .query-input::placeholder { color: var(--text-dim); }
+      /* ─── Query Input ──────────────────────────────────────────────── */
+      .query-card {
+        padding: 24px;
+      }
+      .query-input {
+        width: 100%;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        padding: 16px 18px;
+        font-size: 15px;
+        font-family: inherit;
+        line-height: 1.5;
+        outline: none;
+        transition:
+          border 0.15s,
+          box-shadow 0.15s;
+        resize: vertical;
+        min-height: 56px;
+      }
+      .query-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.15);
+      }
+      .query-input::placeholder {
+        color: var(--text-dim);
+      }
 
-    .query-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 12px; flex-wrap: wrap; }
-    .mode-group { display: flex; gap: 6px; background: var(--surface2); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
-    .mode-pill {
-      padding: 6px 14px; border-radius: 6px; border: none; background: transparent;
-      color: var(--text-mute); font-size: 12px; font-weight: 600; cursor: pointer;
-      transition: all .12s;
-    }
-    .mode-pill:hover { color: var(--text); }
-    .mode-pill.active { background: var(--accent); color: white; box-shadow: var(--shadow-1); }
+      .query-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 14px;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .mode-group {
+        display: flex;
+        gap: 6px;
+        background: var(--surface2);
+        padding: 4px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+      .mode-pill {
+        padding: 6px 14px;
+        border-radius: 6px;
+        border: none;
+        background: transparent;
+        color: var(--text-mute);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.12s;
+      }
+      .mode-pill:hover {
+        color: var(--text);
+      }
+      .mode-pill.active {
+        background: var(--accent);
+        color: white;
+        box-shadow: var(--shadow-1);
+      }
 
-    .btn-primary {
-      padding: 10px 20px; background: var(--accent); color: white; border: none;
-      border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
-      transition: opacity .12s, transform .05s;
-      display: inline-flex; align-items: center; gap: 6px;
-    }
-    .btn-primary:hover { opacity: .92; }
-    .btn-primary:active { transform: translateY(1px); }
-    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+      .btn-primary {
+        padding: 10px 20px;
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          opacity 0.12s,
+          transform 0.05s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-primary:hover {
+        opacity: 0.92;
+      }
+      .btn-primary:active {
+        transform: translateY(1px);
+      }
+      .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
 
-    /* ─── Example Cards ────────────────────────────────────────────── */
-    .examples-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 12px; margin-top: 4px;
-    }
-    .ex-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; padding: 14px 16px; cursor: pointer;
-      transition: border-color .15s, transform .08s;
-    }
-    .ex-card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
-    .ex-card .ex-tag {
-      display: inline-block; font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .08em;
-      color: var(--accent); padding: 3px 8px;
-      background: rgba(91,141,239,.12); border-radius: 4px; margin-bottom: 8px;
-    }
-    .ex-card .ex-tag.tag-trend { color: var(--accent-3); background: rgba(245,158,11,.12); }
-    .ex-card .ex-tag.tag-risk { color: #c084fc; background: rgba(192,132,252,.12); }
-    .ex-card .ex-q { font-size: 13px; color: var(--text); line-height: 1.4; }
+      /* ─── Example Cards ────────────────────────────────────────────── */
+      .examples-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 12px;
+        margin-top: 4px;
+      }
+      .ex-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 16px;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          transform 0.08s;
+      }
+      .ex-card:hover {
+        border-color: var(--border-strong);
+        transform: translateY(-1px);
+      }
+      .ex-card .ex-tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--accent);
+        padding: 3px 8px;
+        background: rgba(91, 141, 239, 0.12);
+        border-radius: 4px;
+        margin-bottom: 8px;
+      }
+      .ex-card .ex-tag.tag-trend {
+        color: var(--accent-3);
+        background: rgba(245, 158, 11, 0.12);
+      }
+      .ex-card .ex-tag.tag-risk {
+        color: #c084fc;
+        background: rgba(192, 132, 252, 0.12);
+      }
+      .ex-card .ex-q {
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.4;
+      }
 
-    /* ─── Loading Stages ───────────────────────────────────────────── */
-    .loading-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 24px; margin-bottom: 18px;
-    }
-    .ls-stage {
-      display: flex; align-items: center; gap: 12px;
-      padding: 8px 0; font-size: 13px; color: var(--text-mute);
-    }
-    .ls-stage.done { color: var(--accent-2); }
-    .ls-stage.active { color: var(--text); }
-    .ls-stage.pending { opacity: .4; }
-    .ls-stage .ls-icon { width: 18px; display: flex; justify-content: center; }
-    .ls-stage .ls-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-    .ls-stage .ls-check { font-size: 13px; }
-    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--surface3); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+      /* ─── Loading Stages ───────────────────────────────────────────── */
+      .loading-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 18px;
+      }
+      .ls-stage {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 0;
+        font-size: 13px;
+        color: var(--text-mute);
+      }
+      .ls-stage.done {
+        color: var(--accent-2);
+      }
+      .ls-stage.active {
+        color: var(--text);
+      }
+      .ls-stage.pending {
+        opacity: 0.4;
+      }
+      .ls-stage .ls-icon {
+        width: 18px;
+        display: flex;
+        justify-content: center;
+      }
+      .ls-stage .ls-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+      .ls-stage .ls-check {
+        font-size: 13px;
+      }
+      .spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid var(--surface3);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
-    /* ─── Answer Card (the headliner) ──────────────────────────────── */
-    .answer-card {
-      background: linear-gradient(135deg, rgba(91,141,239,.08), rgba(34,197,94,.05));
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-lg); padding: 28px 30px; margin-bottom: 18px;
-      box-shadow: var(--shadow-2);
-    }
-    .ac-head {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; margin-bottom: 14px;
-    }
-    .ac-pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 4px 10px; border-radius: 5px;
-      font-size: 11px; font-weight: 700; letter-spacing: .03em;
-      background: rgba(91,141,239,.15); color: var(--accent);
-    }
-    .ac-pill.basic { background: rgba(154,163,189,.12); color: var(--text-mute); }
-    .ac-conf { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-mute); }
-    .conf-bar { width: 80px; height: 5px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
-    .conf-fill { height: 100%; background: var(--accent-2); transition: width .3s; }
+      /* ─── Answer Card (the headliner) ──────────────────────────────── */
+      .answer-card {
+        background: linear-gradient(
+          135deg,
+          rgba(91, 141, 239, 0.08),
+          rgba(34, 197, 94, 0.05)
+        );
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-lg);
+        padding: 28px 30px;
+        margin-bottom: 18px;
+        box-shadow: var(--shadow-2);
+      }
+      .ac-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+      .ac-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        background: rgba(91, 141, 239, 0.15);
+        color: var(--accent);
+      }
+      .ac-pill.basic {
+        background: rgba(154, 163, 189, 0.12);
+        color: var(--text-mute);
+      }
+      .ac-conf {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        color: var(--text-mute);
+      }
+      .conf-bar {
+        width: 80px;
+        height: 5px;
+        background: var(--surface3);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .conf-fill {
+        height: 100%;
+        background: var(--accent-2);
+        transition: width 0.3s;
+      }
 
-    .ac-meta {
-      display: flex; flex-wrap: wrap; gap: 6px 14px;
-      font-size: 12px; color: var(--text-mute); margin-bottom: 12px;
-    }
-    .ac-meta-item { display: inline-flex; align-items: center; gap: 5px; }
-    .ac-meta-item strong { color: var(--text); font-weight: 600; }
+      .ac-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 14px;
+        font-size: 12px;
+        color: var(--text-mute);
+        margin-bottom: 12px;
+      }
+      .ac-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .ac-meta-item strong {
+        color: var(--text);
+        font-weight: 600;
+      }
 
-    .ac-value {
-      font-size: 42px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1;
-      color: var(--text); margin: 6px 0 4px; word-break: break-word;
-    }
-    .ac-value.qual { font-size: 17px; font-weight: 500; line-height: 1.6; color: var(--text); }
-    .ac-unit { font-size: 22px; color: var(--text-mute); font-weight: 600; margin-left: 6px; }
+      .ac-value {
+        font-size: 42px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        color: var(--text);
+        margin: 6px 0 4px;
+        word-break: break-word;
+      }
+      .ac-value.qual {
+        font-size: 17px;
+        font-weight: 500;
+        line-height: 1.6;
+        color: var(--text);
+      }
+      .ac-unit {
+        font-size: 22px;
+        color: var(--text-mute);
+        font-weight: 600;
+        margin-left: 6px;
+      }
 
-    .ac-source {
-      margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border);
-      font-size: 12px; color: var(--text-dim); display: flex; gap: 14px; flex-wrap: wrap;
-    }
-    .ac-source-item { display: inline-flex; align-items: center; gap: 5px; }
+      .ac-source {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px dashed var(--border);
+        font-size: 12px;
+        color: var(--text-dim);
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .ac-source-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
 
-    /* ─── Trend Card ───────────────────────────────────────────────── */
-    .trend-card { padding: 24px 26px; }
-    .trend-summary { font-size: 14px; color: var(--text); line-height: 1.6; margin-bottom: 16px; }
-    .trend-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .trend-table th { text-align: left; padding: 8px 10px; font-size: 10px; font-weight: 700; color: var(--text-dim); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
-    .trend-table td { padding: 10px; border-bottom: 1px solid var(--border); }
-    .trend-table td.year { color: var(--text-mute); font-weight: 500; }
-    .trend-table td.value { font-weight: 700; color: var(--text); }
-    .trend-table td.delta { color: var(--accent-2); font-size: 12px; }
-    .trend-table td.delta.neg { color: var(--danger); }
-    .trend-chart { position: relative; height: 220px; margin-top: 16px; }
+      /* ─── Trend Card ───────────────────────────────────────────────── */
+      .trend-card {
+        padding: 24px 26px;
+      }
+      .trend-summary {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+      .trend-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .trend-table th {
+        text-align: left;
+        padding: 8px 10px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-dim);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border);
+      }
+      .trend-table td {
+        padding: 10px;
+        border-bottom: 1px solid var(--border);
+      }
+      .trend-table td.year {
+        color: var(--text-mute);
+        font-weight: 500;
+      }
+      .trend-table td.value {
+        font-weight: 700;
+        color: var(--text);
+      }
+      .trend-table td.delta {
+        color: var(--accent-2);
+        font-size: 12px;
+      }
+      .trend-table td.delta.neg {
+        color: var(--danger);
+      }
+      .trend-chart {
+        position: relative;
+        height: 220px;
+        margin-top: 16px;
+      }
 
-    /* ─── Evidence (collapsible) ───────────────────────────────────── */
-    details.evidence-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); margin-bottom: 18px; overflow: hidden;
-    }
-    details.evidence-card summary {
-      padding: 14px 22px; font-size: 12px; font-weight: 600; color: var(--text-mute);
-      cursor: pointer; user-select: none; list-style: none;
-      display: flex; align-items: center; gap: 10px;
-      transition: color .1s;
-    }
-    details.evidence-card summary:hover { color: var(--text); }
-    details.evidence-card summary::-webkit-details-marker { display: none; }
-    details.evidence-card summary .chev { font-size: 10px; transition: transform .15s; color: var(--text-dim); }
-    details.evidence-card[open] summary .chev { transform: rotate(90deg); }
-    details.evidence-card .evidence-body { padding: 0 22px 22px; display: flex; flex-direction: column; gap: 10px; }
-    .ev-chunk { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
-    .ev-chunk-meta { font-size: 10px; color: var(--text-dim); margin-bottom: 6px; display: flex; gap: 12px; }
-    .ev-chunk-meta strong { color: var(--text-mute); font-weight: 600; }
-    .ev-chunk-text { font-size: 12px; color: var(--text-mute); line-height: 1.5; max-height: 80px; overflow: hidden; }
+      /* ─── Evidence (collapsible) ───────────────────────────────────── */
+      details.evidence-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 18px;
+        overflow: hidden;
+      }
+      details.evidence-card summary {
+        padding: 14px 22px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-mute);
+        cursor: pointer;
+        user-select: none;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: color 0.1s;
+      }
+      details.evidence-card summary:hover {
+        color: var(--text);
+      }
+      details.evidence-card summary::-webkit-details-marker {
+        display: none;
+      }
+      details.evidence-card summary .chev {
+        font-size: 10px;
+        transition: transform 0.15s;
+        color: var(--text-dim);
+      }
+      details.evidence-card[open] summary .chev {
+        transform: rotate(90deg);
+      }
+      details.evidence-card .evidence-body {
+        padding: 0 22px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .ev-chunk {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 14px;
+      }
+      .ev-chunk-meta {
+        font-size: 10px;
+        color: var(--text-dim);
+        margin-bottom: 6px;
+        display: flex;
+        gap: 12px;
+      }
+      .ev-chunk-meta strong {
+        color: var(--text-mute);
+        font-weight: 600;
+      }
+      .ev-chunk-text {
+        font-size: 12px;
+        color: var(--text-mute);
+        line-height: 1.5;
+        max-height: 80px;
+        overflow: hidden;
+      }
 
-    /* ─── Compare Mode ────────────────────────────────────────────── */
-    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media (max-width: 880px) { .compare-grid { grid-template-columns: 1fr; } }
+      /* ─── Compare Mode ────────────────────────────────────────────── */
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      @media (max-width: 880px) {
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+      }
 
-    /* ─── Benchmark Tab ────────────────────────────────────────────── */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 12px; margin-bottom: 22px; }
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
-    .stat-card .stat-val { font-size: 30px; font-weight: 800; letter-spacing: -.02em; color: var(--accent-2); }
-    .stat-card .stat-lbl { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .08em; margin-top: 4px; font-weight: 600; }
-    .stat-card .stat-delta { margin-top: 6px; font-size: 12px; color: var(--accent-2); font-weight: 600; }
+      /* ─── Benchmark Tab ────────────────────────────────────────────── */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+      .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+      }
+      .stat-card .stat-val {
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--accent-2);
+      }
+      .stat-card .stat-lbl {
+        font-size: 11px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-top: 4px;
+        font-weight: 600;
+      }
+      .stat-card .stat-delta {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--accent-2);
+        font-weight: 600;
+      }
 
-    table.bm-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    table.bm-table th { background: var(--surface2); color: var(--text-dim); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-weight: 700; }
-    table.bm-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
-    table.bm-table tr:last-child td { border-bottom: none; }
-    .tra-yes { color: var(--accent-2); font-weight: 700; }
-    .tra-no { color: var(--danger); }
-    .q-type { font-size: 9px; color: var(--text-mute); padding: 2px 6px; background: var(--surface2); border-radius: 4px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+      table.bm-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      table.bm-table th {
+        background: var(--surface2);
+        color: var(--text-dim);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        font-weight: 700;
+      }
+      table.bm-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      table.bm-table tr:last-child td {
+        border-bottom: none;
+      }
+      .tra-yes {
+        color: var(--accent-2);
+        font-weight: 700;
+      }
+      .tra-no {
+        color: var(--danger);
+      }
+      .q-type {
+        font-size: 9px;
+        color: var(--text-mute);
+        padding: 2px 6px;
+        background: var(--surface2);
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 600;
+      }
 
-    /* ─── Pipeline Tab ─────────────────────────────────────────────── */
-    .pl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 12px; margin-bottom: 18px; }
-    .pl-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
-    .pl-card .pl-stk { font-size: 16px; font-weight: 700; }
-    .pl-card .pl-yrs { font-size: 11px; color: var(--text-dim); margin-top: 6px; display: flex; flex-wrap: wrap; gap: 8px; }
-    .yr-dot { display: inline-flex; align-items: center; gap: 4px; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; }
-    .dot.green { background: var(--accent-2); }
-    .dot.yellow { background: var(--accent-3); }
-    .dot.gray { background: var(--text-dim); }
+      /* ─── Pipeline Tab ─────────────────────────────────────────────── */
+      .pl-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .pl-card {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px;
+      }
+      .pl-card .pl-stk {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .pl-card .pl-yrs {
+        font-size: 11px;
+        color: var(--text-dim);
+        margin-top: 6px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .yr-dot {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+      .dot.green {
+        background: var(--accent-2);
+      }
+      .dot.yellow {
+        background: var(--accent-3);
+      }
+      .dot.gray {
+        background: var(--text-dim);
+      }
 
-    /* ─── Misc ─────────────────────────────────────────────────────── */
-    .err {
-      background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.3);
-      color: var(--danger); padding: 12px 16px; border-radius: 8px;
-      font-size: 13px; margin-bottom: 14px;
-    }
-    .muted { color: var(--text-mute); }
-    .small { font-size: 12px; }
-  </style>
-</head>
-<body>
-<div class="app">
-
-  <!-- ─────────────────────────────── Sidebar ─────────────────────────────── -->
-  <nav class="sidebar">
-    <div class="sb-brand">
-      <div class="sb-logo">F</div>
-      <div>
-        <h1>FilingsIQ</h1>
-        <p>SEC 10-K Intelligence</p>
-      </div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-title">Workspace</div>
-      <div class="sb-nav-item active" id="nav-query" onclick="switchTab('query', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        Ask
-      </div>
-      <div class="sb-nav-item" id="nav-benchmark" onclick="switchTab('benchmark', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
-        Benchmark
-      </div>
-      <div class="sb-nav-item" id="nav-pipeline" onclick="switchTab('pipeline', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        Pipeline
-      </div>
-    </div>
-
-    <div class="sb-footer">
-      <div class="sb-status"><span class="status-dot"></span> System operational</div>
-      <div style="margin-top:6px">v1.0 · Groq + LlamaParse</div>
-    </div>
-  </nav>
-
-  <!-- ─────────────────────────────── Main ────────────────────────────────── -->
-  <main class="main">
-
-    <!-- ── Tab: Query ──────────────────────────────────────────────────────── -->
-    <div id="tab-query" class="tab-panel active">
-      <div class="ph">
-        <div>
-          <h2>Ask the filings</h2>
-          <p>Cross-year financial intelligence over SEC 10-K disclosures</p>
-        </div>
-      </div>
-
-      <!-- Query input card -->
-      <div class="card query-card">
-        <textarea id="q-input" class="query-input" rows="2"
-          placeholder="Try: How did Apple's R&D expenses change from 2021 to 2023? &#10;Or: What was Microsoft's Intelligent Cloud revenue in 2022?"></textarea>
-        <div class="query-controls">
-          <div class="mode-group">
-            <button class="mode-pill active" id="mode-graph" onclick="setMode('graph')">Smart Mode</button>
-            <button class="mode-pill" id="mode-naive" onclick="setMode('naive')">Basic Mode</button>
-            <button class="mode-pill" id="mode-compare" onclick="setMode('compare')">Compare</button>
+      /* ─── Misc ─────────────────────────────────────────────────────── */
+      .err {
+        background: rgba(239, 68, 68, 0.08);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: var(--danger);
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 14px;
+      }
+      .muted {
+        color: var(--text-mute);
+      }
+      .small {
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- ─────────────────────────────── Sidebar ─────────────────────────────── -->
+      <nav class="sidebar">
+        <div class="sb-brand">
+          <div class="sb-logo">F</div>
+          <div>
+            <h1>FilingsIQ</h1>
+            <p>SEC 10-K Intelligence</p>
           </div>
-          <button class="btn-primary" onclick="runQuery()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+
+        <div class="sb-section">
+          <div class="sb-section-title">Workspace</div>
+          <div
+            class="sb-nav-item active"
+            id="nav-query"
+            onclick="switchTab('query', this)"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
             Ask
-          </button>
-        </div>
-      </div>
-
-      <!-- Loading state -->
-      <div id="q-loading" class="loading-card" style="display:none">
-        <div class="card-title" style="margin-bottom:14px">Analyzing</div>
-        <div class="ls-stage active" id="ls-1"><span class="ls-icon"><span class="spinner"></span></span><span>Parsing question (ticker, year, metric)</span></div>
-        <div class="ls-stage pending" id="ls-2"><span class="ls-icon"><span class="ls-dot"></span></span><span>Hybrid retrieval (vector + BM25 + RRF)</span></div>
-        <div class="ls-stage pending" id="ls-3"><span class="ls-icon"><span class="ls-dot"></span></span><span>Cross-encoder reranking</span></div>
-        <div class="ls-stage pending" id="ls-4"><span class="ls-icon"><span class="ls-dot"></span></span><span>Synthesizing answer</span></div>
-      </div>
-
-      <!-- Error -->
-      <div id="q-error" class="err" style="display:none"></div>
-
-      <!-- Single-mode result: Answer Card → Trend Card → Evidence -->
-      <div id="q-result" style="display:none">
-        <div id="q-answer-card" class="answer-card"></div>
-        <div id="q-trend-card" style="display:none"></div>
-        <div id="q-evidence"></div>
-      </div>
-
-      <!-- Compare-mode result -->
-      <div id="q-compare" style="display:none">
-        <div class="compare-grid">
-          <div id="q-compare-graph"></div>
-          <div id="q-compare-naive"></div>
-        </div>
-      </div>
-
-      <!-- Example cards -->
-      <div class="card" id="q-examples">
-        <div class="card-head"><div class="card-title">Example questions</div></div>
-        <div class="examples-grid">
-          <div class="ex-card" onclick="setExample(this)">
-            <span class="ex-tag">Single Year</span>
-            <div class="ex-q">What was Apple's R&D expense in 2021?</div>
           </div>
-          <div class="ex-card" onclick="setExample(this)">
-            <span class="ex-tag tag-trend">Multi-Year Trend</span>
-            <div class="ex-q">How did Apple's R&D expenses change from 2021 to 2023?</div>
+          <div
+            class="sb-nav-item"
+            id="nav-benchmark"
+            onclick="switchTab('benchmark', this)"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M3 3v18h18" />
+              <path d="M7 14l4-4 4 4 5-5" />
+            </svg>
+            Benchmark
           </div>
-          <div class="ex-card" onclick="setExample(this)">
-            <span class="ex-tag">Single Year</span>
-            <div class="ex-q">What was Microsoft's Intelligent Cloud revenue in 2022?</div>
-          </div>
-          <div class="ex-card" onclick="setExample(this)">
-            <span class="ex-tag tag-risk">Risk Disclosure</span>
-            <div class="ex-q">What supply chain risks did Apple identify in 2022?</div>
-          </div>
-          <div class="ex-card" onclick="setExample(this)">
-            <span class="ex-tag tag-trend">Multi-Year Trend</span>
-            <div class="ex-q">How did Microsoft's net income evolve from 2021 to 2023?</div>
-          </div>
-          <div class="ex-card" onclick="setExample(this)">
-            <span class="ex-tag">Single Year</span>
-            <div class="ex-q">What was Apple's gross margin in 2022?</div>
+          <div
+            class="sb-nav-item"
+            id="nav-pipeline"
+            onclick="switchTab('pipeline', this)"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            Pipeline
           </div>
         </div>
-      </div>
+
+        <div class="sb-footer">
+          <div class="sb-status">
+            <span class="status-dot"></span> System operational
+          </div>
+          <div style="margin-top: 6px">v1.0 · Groq + LlamaParse</div>
+        </div>
+      </nav>
+
+      <!-- ─────────────────────────────── Main ────────────────────────────────── -->
+      <main class="main">
+        <!-- ── Tab: Query ──────────────────────────────────────────────────────── -->
+        <div id="tab-query" class="tab-panel active">
+          <div class="ph">
+            <div>
+              <h2>Ask the filings</h2>
+              <p>Cross-year financial intelligence over SEC 10-K disclosures</p>
+            </div>
+          </div>
+
+          <!-- Query input card -->
+          <div class="card query-card">
+            <textarea
+              id="q-input"
+              class="query-input"
+              rows="2"
+              placeholder="Try: How did Apple's R&D expenses change from 2021 to 2023? &#10;Or: What was Microsoft's Intelligent Cloud revenue in 2022?"
+            ></textarea>
+            <div class="query-controls">
+              <div class="mode-group">
+                <button
+                  class="mode-pill active"
+                  id="mode-graph"
+                  onclick="setMode('graph')"
+                >
+                  Smart Mode
+                </button>
+                <button
+                  class="mode-pill"
+                  id="mode-naive"
+                  onclick="setMode('naive')"
+                >
+                  Basic Mode
+                </button>
+                <button
+                  class="mode-pill"
+                  id="mode-compare"
+                  onclick="setMode('compare')"
+                >
+                  Compare
+                </button>
+              </div>
+              <button class="btn-primary" onclick="runQuery()">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+                Ask
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading state -->
+          <div id="q-loading" class="loading-card" style="display: none">
+            <div class="card-title" style="margin-bottom: 14px">Analyzing</div>
+            <div class="ls-stage active" id="ls-1">
+              <span class="ls-icon"><span class="spinner"></span></span
+              ><span>Parsing question (ticker, year, metric)</span>
+            </div>
+            <div class="ls-stage pending" id="ls-2">
+              <span class="ls-icon"><span class="ls-dot"></span></span
+              ><span>Hybrid retrieval (vector + BM25 + RRF)</span>
+            </div>
+            <div class="ls-stage pending" id="ls-3">
+              <span class="ls-icon"><span class="ls-dot"></span></span
+              ><span>Cross-encoder reranking</span>
+            </div>
+            <div class="ls-stage pending" id="ls-4">
+              <span class="ls-icon"><span class="ls-dot"></span></span
+              ><span>Synthesizing answer</span>
+            </div>
+          </div>
+
+          <!-- Error -->
+          <div id="q-error" class="err" style="display: none"></div>
+
+          <!-- Single-mode result: Answer Card → Trend Card → Evidence -->
+          <div id="q-result" style="display: none">
+            <div id="q-answer-card" class="answer-card"></div>
+            <div id="q-trend-card" style="display: none"></div>
+            <div id="q-evidence"></div>
+          </div>
+
+          <!-- Compare-mode result -->
+          <div id="q-compare" style="display: none">
+            <div class="compare-grid">
+              <div id="q-compare-graph"></div>
+              <div id="q-compare-naive"></div>
+            </div>
+          </div>
+
+          <!-- Example cards -->
+          <div class="card" id="q-examples">
+            <div class="card-head">
+              <div class="card-title">Example questions</div>
+            </div>
+            <div class="examples-grid">
+              <div class="ex-card" onclick="setExample(this)">
+                <span class="ex-tag">Single Year</span>
+                <div class="ex-q">What was Apple's R&D expense in 2021?</div>
+              </div>
+              <div class="ex-card" onclick="setExample(this)">
+                <span class="ex-tag tag-trend">Multi-Year Trend</span>
+                <div class="ex-q">
+                  How did Apple's R&D expenses change from 2021 to 2023?
+                </div>
+              </div>
+              <div class="ex-card" onclick="setExample(this)">
+                <span class="ex-tag">Single Year</span>
+                <div class="ex-q">
+                  What was Microsoft's Intelligent Cloud revenue in 2022?
+                </div>
+              </div>
+              <div class="ex-card" onclick="setExample(this)">
+                <span class="ex-tag tag-risk">Risk Disclosure</span>
+                <div class="ex-q">
+                  What supply chain risks did Apple identify in 2022?
+                </div>
+              </div>
+              <div class="ex-card" onclick="setExample(this)">
+                <span class="ex-tag tag-trend">Multi-Year Trend</span>
+                <div class="ex-q">
+                  How did Microsoft's net income evolve from 2021 to 2023?
+                </div>
+              </div>
+              <div class="ex-card" onclick="setExample(this)">
+                <span class="ex-tag">Single Year</span>
+                <div class="ex-q">What was Apple's gross margin in 2022?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Tab: Benchmark ─────────────────────────────────────────────────── -->
+        <div id="tab-benchmark" class="tab-panel">
+          <div class="ph">
+            <div>
+              <h2>Benchmark</h2>
+              <p>
+                Smart Mode (production GraphRAG) vs. Basic Mode (vanilla vector
+                RAG)
+              </p>
+            </div>
+            <button class="btn-primary" onclick="triggerBenchmark()">
+              Re-run
+            </button>
+          </div>
+
+          <div id="bm-loading" class="loading-card">
+            <div class="ls-stage active">
+              <span class="ls-icon"><span class="spinner"></span></span
+              ><span>Loading benchmark results…</span>
+            </div>
+          </div>
+          <div id="bm-error" class="err" style="display: none"></div>
+
+          <div id="bm-content" style="display: none">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-val" id="bm-tra-struct">—</div>
+                <div class="stat-lbl">Smart Mode TRA</div>
+                <div class="stat-delta" id="bm-tra-delta">—</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-val" id="bm-acs-struct">—</div>
+                <div class="stat-lbl">Answer Correctness</div>
+                <div class="stat-delta" id="bm-acs-delta">—</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-val" id="bm-cyc-struct">—</div>
+                <div class="stat-lbl">Cross-Year Coherence</div>
+                <div class="stat-delta" id="bm-cyc-delta">—</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div class="card-title">Metric Comparison</div>
+              </div>
+              <div style="position: relative; height: 280px">
+                <canvas id="bm-chart"></canvas>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <div class="card-title">Per-Question Results</div>
+              </div>
+              <div style="overflow-x: auto">
+                <table class="bm-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Question</th>
+                      <th>Type</th>
+                      <th>Basic TRA</th>
+                      <th>Smart TRA</th>
+                      <th>Basic ACS</th>
+                      <th>Smart ACS</th>
+                      <th>Basic ms</th>
+                      <th>Smart ms</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bm-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <p
+              class="small muted"
+              style="text-align: right; margin-top: 8px"
+              id="bm-generated-at"
+            ></p>
+            <div
+              id="bm-job-status"
+              class="small muted"
+              style="margin-top: 8px"
+            ></div>
+          </div>
+        </div>
+
+        <!-- ── Tab: Pipeline ──────────────────────────────────────────────────── -->
+        <div id="tab-pipeline" class="tab-panel">
+          <div class="ph">
+            <div>
+              <h2>Data pipeline</h2>
+              <p>
+                SEC EDGAR → LlamaParse → ChromaDB. Run once locally, deploy
+                artifacts.
+              </p>
+            </div>
+            <button class="btn-primary" onclick="loadPipelineStatus()">
+              Refresh
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Indexed Filings</div>
+            </div>
+            <div id="pl-grid" class="pl-grid">
+              <div class="muted small">Loading…</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Stage 1 — Download from SEC EDGAR</div>
+            </div>
+            <p class="small muted" style="margin-bottom: 12px">
+              Downloads 10-K filings (HTML) using direct EDGAR API calls. Free,
+              no auth.
+            </p>
+            <button class="btn-primary" onclick="triggerStage('download')">
+              Run Download
+            </button>
+            <div
+              id="job-download"
+              class="small muted"
+              style="margin-top: 10px"
+            ></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Stage 2 — Parse with LlamaParse</div>
+            </div>
+            <p class="small muted" style="margin-bottom: 12px">
+              Sends each filing to LlamaParse cloud. Returns structured Markdown
+              with tables intact.
+            </p>
+            <button class="btn-primary" onclick="triggerStage('parse')">
+              Run Parse
+            </button>
+            <div
+              id="job-parse"
+              class="small muted"
+              style="margin-top: 10px"
+            ></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Stage 3 — Build Index</div>
+            </div>
+            <p class="small muted" style="margin-bottom: 12px">
+              Builds naive + structured ChromaDB indexes (~10 min).
+            </p>
+            <button class="btn-primary" onclick="triggerStage('build-index')">
+              Build Index
+            </button>
+            <div
+              id="job-build-index"
+              class="small muted"
+              style="margin-top: 10px"
+            ></div>
+          </div>
+        </div>
+      </main>
     </div>
 
-    <!-- ── Tab: Benchmark ─────────────────────────────────────────────────── -->
-    <div id="tab-benchmark" class="tab-panel">
-      <div class="ph">
-        <div>
-          <h2>Benchmark</h2>
-          <p>Smart Mode (production GraphRAG) vs. Basic Mode (vanilla vector RAG)</p>
-        </div>
-        <button class="btn-primary" onclick="triggerBenchmark()">Re-run</button>
-      </div>
+    <script>
+      const API = '';
+      let _mode = 'graph';
+      let _bmChart = null;
+      let _trendChart = null;
 
-      <div id="bm-loading" class="loading-card"><div class="ls-stage active"><span class="ls-icon"><span class="spinner"></span></span><span>Loading benchmark results…</span></div></div>
-      <div id="bm-error" class="err" style="display:none"></div>
+      // ── Tab routing ─────────────────────────────────────────────────────────
+      function switchTab(name, el) {
+        document
+          .querySelectorAll('.tab-panel')
+          .forEach((p) => p.classList.remove('active'));
+        document
+          .querySelectorAll('.sb-nav-item')
+          .forEach((n) => n.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        if (el) el.classList.add('active');
+        if (name === 'benchmark') loadBenchmarkResults();
+        if (name === 'pipeline') loadPipelineStatus();
+      }
 
-      <div id="bm-content" style="display:none">
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-val" id="bm-tra-struct">—</div><div class="stat-lbl">Smart Mode TRA</div><div class="stat-delta" id="bm-tra-delta">—</div></div>
-          <div class="stat-card"><div class="stat-val" id="bm-acs-struct">—</div><div class="stat-lbl">Answer Correctness</div><div class="stat-delta" id="bm-acs-delta">—</div></div>
-          <div class="stat-card"><div class="stat-val" id="bm-cyc-struct">—</div><div class="stat-lbl">Cross-Year Coherence</div><div class="stat-delta" id="bm-cyc-delta">—</div></div>
-        </div>
+      // ── Query tab ───────────────────────────────────────────────────────────
+      function setMode(m) {
+        _mode = m;
+        ['graph', 'naive', 'compare'].forEach((x) =>
+          document.getElementById('mode-' + x).classList.remove('active')
+        );
+        document.getElementById('mode-' + m).classList.add('active');
+      }
 
-        <div class="card">
-          <div class="card-head"><div class="card-title">Metric Comparison</div></div>
-          <div style="position:relative;height:280px"><canvas id="bm-chart"></canvas></div>
-        </div>
+      function setExample(card) {
+        const text = card.querySelector('.ex-q').textContent;
+        document.getElementById('q-input').value = text;
+        document.getElementById('q-input').focus();
+      }
 
-        <div class="card">
-          <div class="card-head"><div class="card-title">Per-Question Results</div></div>
-          <div style="overflow-x:auto">
-            <table class="bm-table">
-              <thead><tr><th>#</th><th>Question</th><th>Type</th><th>Basic TRA</th><th>Smart TRA</th><th>Basic ACS</th><th>Smart ACS</th><th>Basic ms</th><th>Smart ms</th></tr></thead>
-              <tbody id="bm-table-body"></tbody>
-            </table>
-          </div>
-        </div>
+      async function runQuery() {
+        const question = document.getElementById('q-input').value.trim();
+        if (!question) return;
 
-        <p class="small muted" style="text-align:right;margin-top:8px" id="bm-generated-at"></p>
-        <div id="bm-job-status" class="small muted" style="margin-top:8px"></div>
-      </div>
-    </div>
+        document.getElementById('q-loading').style.display = '';
+        document.getElementById('q-result').style.display = 'none';
+        document.getElementById('q-compare').style.display = 'none';
+        document.getElementById('q-error').style.display = 'none';
 
-    <!-- ── Tab: Pipeline ──────────────────────────────────────────────────── -->
-    <div id="tab-pipeline" class="tab-panel">
-      <div class="ph">
-        <div>
-          <h2>Data pipeline</h2>
-          <p>SEC EDGAR → LlamaParse → ChromaDB. Run once locally, deploy artifacts.</p>
-        </div>
-        <button class="btn-primary" onclick="loadPipelineStatus()">Refresh</button>
-      </div>
+        const stages = ['ls-1', 'ls-2', 'ls-3', 'ls-4'];
+        resetStages(stages);
+        const t = advanceStages(stages, 1500);
 
-      <div class="card">
-        <div class="card-head"><div class="card-title">Indexed Filings</div></div>
-        <div id="pl-grid" class="pl-grid"><div class="muted small">Loading…</div></div>
-      </div>
+        try {
+          if (_mode === 'compare') {
+            const res = await apiFetch('/api/query/compare', {
+              method: 'POST',
+              body: JSON.stringify({ question }),
+            });
+            renderCompare(res);
+          } else {
+            const res = await apiFetch('/api/query', {
+              method: 'POST',
+              body: JSON.stringify({ question, mode: _mode }),
+            });
+            renderSingle(res);
+          }
+        } catch (e) {
+          showError('q-error', e.message);
+        } finally {
+          clearInterval(t);
+          document.getElementById('q-loading').style.display = 'none';
+        }
+      }
 
-      <div class="card">
-        <div class="card-head"><div class="card-title">Stage 1 — Download from SEC EDGAR</div></div>
-        <p class="small muted" style="margin-bottom:12px">Downloads 10-K filings (HTML) using direct EDGAR API calls. Free, no auth.</p>
-        <button class="btn-primary" onclick="triggerStage('download')">Run Download</button>
-        <div id="job-download" class="small muted" style="margin-top:10px"></div>
-      </div>
+      function resetStages(ids) {
+        ids.forEach((id, i) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.className = 'ls-stage ' + (i === 0 ? 'active' : 'pending');
+          const icon = el.querySelector('.ls-icon');
+          icon.innerHTML =
+            i === 0
+              ? '<span class="spinner"></span>'
+              : '<span class="ls-dot"></span>';
+        });
+      }
+      function advanceStages(ids, ms) {
+        let i = 0;
+        return setInterval(() => {
+          if (i >= ids.length - 1) return;
+          const cur = document.getElementById(ids[i]);
+          if (cur) {
+            cur.className = 'ls-stage done';
+            cur.querySelector('.ls-icon').innerHTML =
+              '<span class="ls-check">✓</span>';
+          }
+          i++;
+          const next = document.getElementById(ids[i]);
+          if (next) {
+            next.className = 'ls-stage active';
+            next.querySelector('.ls-icon').innerHTML =
+              '<span class="spinner"></span>';
+          }
+        }, ms);
+      }
 
-      <div class="card">
-        <div class="card-head"><div class="card-title">Stage 2 — Parse with LlamaParse</div></div>
-        <p class="small muted" style="margin-bottom:12px">Sends each filing to LlamaParse cloud. Returns structured Markdown with tables intact.</p>
-        <button class="btn-primary" onclick="triggerStage('parse')">Run Parse</button>
-        <div id="job-parse" class="small muted" style="margin-top:10px"></div>
-      </div>
+      // ── Render: single mode ─────────────────────────────────────────────────
+      function renderSingle(res) {
+        const ansEl = document.getElementById('q-answer-card');
+        const trendEl = document.getElementById('q-trend-card');
+        const evEl = document.getElementById('q-evidence');
 
-      <div class="card">
-        <div class="card-head"><div class="card-title">Stage 3 — Build Index</div></div>
-        <p class="small muted" style="margin-bottom:12px">Builds naive + structured ChromaDB indexes (~10 min).</p>
-        <button class="btn-primary" onclick="triggerStage('build-index')">Build Index</button>
-        <div id="job-build-index" class="small muted" style="margin-top:10px"></div>
-      </div>
-    </div>
+        ansEl.innerHTML = renderAnswerCardHTML(res);
 
-  </main>
-</div>
+        // Trend card if applicable
+        const s = res.structured;
+        if (s && s.kind === 'trend' && s.series && s.series.length >= 2) {
+          trendEl.innerHTML = renderTrendCardHTML(s);
+          trendEl.style.display = '';
+          setTimeout(() => drawTrendChart(s), 0);
+        } else {
+          trendEl.style.display = 'none';
+          trendEl.innerHTML = '';
+        }
 
-<script>
-const API = '';
-let _mode = 'graph';
-let _bmChart = null;
-let _trendChart = null;
+        evEl.innerHTML = renderEvidenceHTML(res);
+        document.getElementById('q-result').style.display = '';
+        // Hide examples once user has run a query (cleaner)
+        document.getElementById('q-examples').style.display = 'none';
+      }
 
-// ── Tab routing ─────────────────────────────────────────────────────────
-function switchTab(name, el) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sb-nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  if (el) el.classList.add('active');
-  if (name === 'benchmark') loadBenchmarkResults();
-  if (name === 'pipeline') loadPipelineStatus();
-}
+      function renderAnswerCardHTML(res) {
+        const s = res.structured || {};
+        const isSmartMode = res.mode === 'graph';
+        const pillCls = isSmartMode ? 'ac-pill' : 'ac-pill basic';
+        const pillTxt = isSmartMode ? 'SMART MODE' : 'BASIC MODE';
 
-// ── Query tab ───────────────────────────────────────────────────────────
-function setMode(m) {
-  _mode = m;
-  ['graph','naive','compare'].forEach(x => document.getElementById('mode-' + x).classList.remove('active'));
-  document.getElementById('mode-' + m).classList.add('active');
-}
+        const conf = Math.max(0, Math.min(1, +(s.confidence || 0)));
+        const confPct = Math.round(conf * 100);
 
-function setExample(card) {
-  const text = card.querySelector('.ex-q').textContent;
-  document.getElementById('q-input').value = text;
-  document.getElementById('q-input').focus();
-}
+        // Big-value display only when we have a numeric value
+        let valueBlock = '';
+        if (s.kind === 'value' && s.value != null) {
+          const formatted = formatValue(s.value, s.unit);
+          valueBlock = `<div class="ac-value">${formatted.num}<span class="ac-unit">${escHtml(formatted.unit || '')}</span></div>`;
+        } else if (s.kind === 'trend' && s.series && s.series.length) {
+          // Show summary line for trends; chart sits in trend card
+          valueBlock = `<div class="ac-value qual">${escHtml(res.answer)}</div>`;
+        } else {
+          valueBlock = `<div class="ac-value qual">${escHtml(res.answer)}</div>`;
+        }
 
-async function runQuery() {
-  const question = document.getElementById('q-input').value.trim();
-  if (!question) return;
+        const meta = [];
+        if (s.ticker)
+          meta.push(
+            `<span class="ac-meta-item">📊 <strong>${escHtml(s.ticker)}</strong></span>`
+          );
+        if (s.metric)
+          meta.push(
+            `<span class="ac-meta-item">📈 ${escHtml(s.metric)}</span>`
+          );
+        if (s.year)
+          meta.push(
+            `<span class="ac-meta-item">📅 FY ${escHtml(String(s.year))}</span>`
+          );
+        if (s.kind === 'trend')
+          meta.push(
+            `<span class="ac-meta-item">📅 ${s.series.length} years</span>`
+          );
 
-  document.getElementById('q-loading').style.display = '';
-  document.getElementById('q-result').style.display = 'none';
-  document.getElementById('q-compare').style.display = 'none';
-  document.getElementById('q-error').style.display = 'none';
+        const sourceLine = s.source
+          ? `<span class="ac-source-item">📄 ${escHtml(s.source)}</span>`
+          : '';
+        const latencyLine = `<span class="ac-source-item">⚡ ${(res.latency_ms / 1000).toFixed(1)}s</span>`;
+        const retrievedLine =
+          res.graph_path && res.graph_path.length
+            ? `<span class="ac-source-item">🔗 ${res.graph_path.slice(0, 3).join(' · ')}</span>`
+            : '';
 
-  const stages = ['ls-1','ls-2','ls-3','ls-4'];
-  resetStages(stages);
-  const t = advanceStages(stages, 1500);
-
-  try {
-    if (_mode === 'compare') {
-      const res = await apiFetch('/api/query/compare', { method:'POST', body: JSON.stringify({ question }) });
-      renderCompare(res);
-    } else {
-      const res = await apiFetch('/api/query', { method:'POST', body: JSON.stringify({ question, mode: _mode }) });
-      renderSingle(res);
-    }
-  } catch(e) {
-    showError('q-error', e.message);
-  } finally {
-    clearInterval(t);
-    document.getElementById('q-loading').style.display = 'none';
-  }
-}
-
-function resetStages(ids) {
-  ids.forEach((id,i) => {
-    const el = document.getElementById(id); if (!el) return;
-    el.className = 'ls-stage ' + (i===0 ? 'active' : 'pending');
-    const icon = el.querySelector('.ls-icon');
-    icon.innerHTML = i===0 ? '<span class="spinner"></span>' : '<span class="ls-dot"></span>';
-  });
-}
-function advanceStages(ids, ms) {
-  let i = 0;
-  return setInterval(() => {
-    if (i >= ids.length-1) return;
-    const cur = document.getElementById(ids[i]);
-    if (cur) { cur.className = 'ls-stage done'; cur.querySelector('.ls-icon').innerHTML = '<span class="ls-check">✓</span>'; }
-    i++;
-    const next = document.getElementById(ids[i]);
-    if (next) { next.className = 'ls-stage active'; next.querySelector('.ls-icon').innerHTML = '<span class="spinner"></span>'; }
-  }, ms);
-}
-
-// ── Render: single mode ─────────────────────────────────────────────────
-function renderSingle(res) {
-  const ansEl = document.getElementById('q-answer-card');
-  const trendEl = document.getElementById('q-trend-card');
-  const evEl = document.getElementById('q-evidence');
-
-  ansEl.innerHTML = renderAnswerCardHTML(res);
-
-  // Trend card if applicable
-  const s = res.structured;
-  if (s && s.kind === 'trend' && s.series && s.series.length >= 2) {
-    trendEl.innerHTML = renderTrendCardHTML(s);
-    trendEl.style.display = '';
-    setTimeout(() => drawTrendChart(s), 0);
-  } else {
-    trendEl.style.display = 'none';
-    trendEl.innerHTML = '';
-  }
-
-  evEl.innerHTML = renderEvidenceHTML(res);
-  document.getElementById('q-result').style.display = '';
-  // Hide examples once user has run a query (cleaner)
-  document.getElementById('q-examples').style.display = 'none';
-}
-
-function renderAnswerCardHTML(res) {
-  const s = res.structured || {};
-  const isSmartMode = res.mode === 'graph';
-  const pillCls = isSmartMode ? 'ac-pill' : 'ac-pill basic';
-  const pillTxt = isSmartMode ? 'SMART MODE' : 'BASIC MODE';
-
-  const conf = Math.max(0, Math.min(1, +(s.confidence || 0)));
-  const confPct = Math.round(conf * 100);
-
-  // Big-value display only when we have a numeric value
-  let valueBlock = '';
-  if (s.kind === 'value' && s.value != null) {
-    const formatted = formatValue(s.value, s.unit);
-    valueBlock = `<div class="ac-value">${formatted.num}<span class="ac-unit">${escHtml(formatted.unit || '')}</span></div>`;
-  } else if (s.kind === 'trend' && s.series && s.series.length) {
-    // Show summary line for trends; chart sits in trend card
-    valueBlock = `<div class="ac-value qual">${escHtml(res.answer)}</div>`;
-  } else {
-    valueBlock = `<div class="ac-value qual">${escHtml(res.answer)}</div>`;
-  }
-
-  const meta = [];
-  if (s.ticker) meta.push(`<span class="ac-meta-item">📊 <strong>${escHtml(s.ticker)}</strong></span>`);
-  if (s.metric) meta.push(`<span class="ac-meta-item">📈 ${escHtml(s.metric)}</span>`);
-  if (s.year) meta.push(`<span class="ac-meta-item">📅 FY ${escHtml(String(s.year))}</span>`);
-  if (s.kind === 'trend') meta.push(`<span class="ac-meta-item">📅 ${s.series.length} years</span>`);
-
-  const sourceLine = s.source ? `<span class="ac-source-item">📄 ${escHtml(s.source)}</span>` : '';
-  const latencyLine = `<span class="ac-source-item">⚡ ${(res.latency_ms/1000).toFixed(1)}s</span>`;
-  const retrievedLine = res.graph_path && res.graph_path.length
-    ? `<span class="ac-source-item">🔗 ${res.graph_path.slice(0,3).join(' · ')}</span>` : '';
-
-  return `
+        return `
     <div class="ac-head">
       <div class="ac-pill">${pillTxt}</div>
       <div class="ac-conf">
@@ -642,28 +1358,31 @@ function renderAnswerCardHTML(res) {
     ${valueBlock}
     <div class="ac-source">${sourceLine}${latencyLine}${retrievedLine}</div>
   `;
-}
+      }
 
-function renderTrendCardHTML(s) {
-  const sorted = [...s.series].sort((a,b)=>a.year-b.year);
-  const rows = sorted.map((d,i) => {
-    let delta = '—';
-    let cls = '';
-    if (i > 0 && sorted[i-1].value) {
-      const pct = ((d.value - sorted[i-1].value) / sorted[i-1].value) * 100;
-      cls = pct >= 0 ? 'delta' : 'delta neg';
-      delta = `<td class="${cls}">${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%</td>`;
-    } else {
-      delta = `<td class="muted">—</td>`;
-    }
-    return `<tr>
+      function renderTrendCardHTML(s) {
+        const sorted = [...s.series].sort((a, b) => a.year - b.year);
+        const rows = sorted
+          .map((d, i) => {
+            let delta = '—';
+            let cls = '';
+            if (i > 0 && sorted[i - 1].value) {
+              const pct =
+                ((d.value - sorted[i - 1].value) / sorted[i - 1].value) * 100;
+              cls = pct >= 0 ? 'delta' : 'delta neg';
+              delta = `<td class="${cls}">${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%</td>`;
+            } else {
+              delta = `<td class="muted">—</td>`;
+            }
+            return `<tr>
       <td class="year">FY ${d.year}</td>
-      <td class="value">${d.value.toLocaleString(undefined, {maximumFractionDigits:0})} ${escHtml(d.unit || '')}</td>
+      <td class="value">${d.value.toLocaleString(undefined, { maximumFractionDigits: 0 })} ${escHtml(d.unit || '')}</td>
       ${delta}
     </tr>`;
-  }).join('');
+          })
+          .join('');
 
-  return `
+        return `
     <div class="card trend-card">
       <div class="card-head"><div class="card-title">Year-over-year breakdown</div></div>
       <table class="trend-table">
@@ -673,221 +1392,343 @@ function renderTrendCardHTML(s) {
       <div class="trend-chart"><canvas id="trend-chart-canvas"></canvas></div>
     </div>
   `;
-}
-
-function drawTrendChart(s) {
-  const canvas = document.getElementById('trend-chart-canvas');
-  if (!canvas) return;
-  if (_trendChart) _trendChart.destroy();
-  const sorted = [...s.series].sort((a,b)=>a.year-b.year);
-  _trendChart = new Chart(canvas.getContext('2d'), {
-    type: 'line',
-    data: {
-      labels: sorted.map(d => 'FY ' + d.year),
-      datasets: [{
-        label: s.metric || 'Value',
-        data: sorted.map(d => d.value),
-        borderColor: '#5b8def',
-        backgroundColor: 'rgba(91,141,239,.15)',
-        fill: true, tension: 0.25, borderWidth: 2,
-        pointBackgroundColor: '#5b8def', pointRadius: 5,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { ticks: { color: '#9aa3bd', callback: v => v.toLocaleString() }, grid: { color: '#2a2f42' } },
-        x: { ticks: { color: '#9aa3bd' }, grid: { display: false } },
       }
-    }
-  });
-}
 
-function renderEvidenceHTML(res) {
-  const sources = (res.source_nodes || []).slice(0, 5);
-  if (!sources.length) return '';
-  const items = sources.map((n,i) => `
+      function drawTrendChart(s) {
+        const canvas = document.getElementById('trend-chart-canvas');
+        if (!canvas) return;
+        if (_trendChart) _trendChart.destroy();
+        const sorted = [...s.series].sort((a, b) => a.year - b.year);
+        _trendChart = new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: sorted.map((d) => 'FY ' + d.year),
+            datasets: [
+              {
+                label: s.metric || 'Value',
+                data: sorted.map((d) => d.value),
+                borderColor: '#5b8def',
+                backgroundColor: 'rgba(91,141,239,.15)',
+                fill: true,
+                tension: 0.25,
+                borderWidth: 2,
+                pointBackgroundColor: '#5b8def',
+                pointRadius: 5,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                ticks: {
+                  color: '#9aa3bd',
+                  callback: (v) => v.toLocaleString(),
+                },
+                grid: { color: '#2a2f42' },
+              },
+              x: { ticks: { color: '#9aa3bd' }, grid: { display: false } },
+            },
+          },
+        });
+      }
+
+      function renderEvidenceHTML(res) {
+        const sources = (res.source_nodes || []).slice(0, 5);
+        if (!sources.length) return '';
+        const items = sources
+          .map(
+            (n, i) => `
     <div class="ev-chunk">
       <div class="ev-chunk-meta">
-        <span><strong>#${i+1}</strong></span>
+        <span><strong>#${i + 1}</strong></span>
         <span><strong>${escHtml(n.ticker || '—')}</strong></span>
         <span>FY ${escHtml(String(n.year || '—'))}</span>
         <span>relevance: ${(n.score || 0).toFixed(3)}</span>
       </div>
       <div class="ev-chunk-text">${escHtml(n.text || '')}</div>
     </div>
-  `).join('');
-  return `
+  `
+          )
+          .join('');
+        return `
     <details class="evidence-card">
       <summary><span class="chev">▶</span> View evidence (${sources.length} source chunks)</summary>
       <div class="evidence-body">${items}</div>
     </details>`;
-}
+      }
 
-function renderCompare(res) {
-  document.getElementById('q-compare-graph').innerHTML = `<div class="answer-card">${innerAnswerCard(res.graph)}</div>`;
-  document.getElementById('q-compare-naive').innerHTML = `<div class="answer-card" style="background:rgba(154,163,189,.04)">${innerAnswerCard(res.naive)}</div>`;
-  document.getElementById('q-compare').style.display = '';
-  document.getElementById('q-examples').style.display = 'none';
-}
-function innerAnswerCard(r) {
-  // Produce just the inner content of an answer card (used in compare grid)
-  return renderAnswerCardHTML(r);
-}
+      function renderCompare(res) {
+        document.getElementById('q-compare-graph').innerHTML =
+          `<div class="answer-card">${innerAnswerCard(res.graph)}</div>`;
+        document.getElementById('q-compare-naive').innerHTML =
+          `<div class="answer-card" style="background:rgba(154,163,189,.04)">${innerAnswerCard(res.naive)}</div>`;
+        document.getElementById('q-compare').style.display = '';
+        document.getElementById('q-examples').style.display = 'none';
+      }
+      function innerAnswerCard(r) {
+        // Produce just the inner content of an answer card (used in compare grid)
+        return renderAnswerCardHTML(r);
+      }
 
-// ── Number formatting ──────────────────────────────────────────────────
-function formatValue(v, unit) {
-  if (v == null || isNaN(v)) return { num: String(v ?? '—'), unit: unit || '' };
-  // Pretty-print large dollar values
-  let num;
-  if (Math.abs(v) >= 1000) {
-    num = v.toLocaleString(undefined, {maximumFractionDigits: 0});
-  } else if (Math.abs(v) >= 100) {
-    num = v.toLocaleString(undefined, {maximumFractionDigits: 1});
-  } else {
-    num = v.toLocaleString(undefined, {maximumFractionDigits: 2});
-  }
-  return { num, unit: unit || '' };
-}
+      // ── Number formatting ──────────────────────────────────────────────────
+      function formatValue(v, unit) {
+        if (v == null || isNaN(v))
+          return { num: String(v ?? '—'), unit: unit || '' };
+        // Pretty-print large dollar values
+        let num;
+        if (Math.abs(v) >= 1000) {
+          num = v.toLocaleString(undefined, { maximumFractionDigits: 0 });
+        } else if (Math.abs(v) >= 100) {
+          num = v.toLocaleString(undefined, { maximumFractionDigits: 1 });
+        } else {
+          num = v.toLocaleString(undefined, { maximumFractionDigits: 2 });
+        }
+        return { num, unit: unit || '' };
+      }
 
-// ── Benchmark tab ──────────────────────────────────────────────────────
-async function loadBenchmarkResults() {
-  document.getElementById('bm-loading').style.display = '';
-  document.getElementById('bm-content').style.display = 'none';
-  document.getElementById('bm-error').style.display = 'none';
-  try {
-    const data = await apiFetch('/api/benchmark/results');
-    renderBenchmark(data);
-  } catch(e) {
-    document.getElementById('bm-loading').style.display = 'none';
-    showError('bm-error', 'No benchmark results yet. Click Re-run to generate them.');
-    document.getElementById('bm-content').style.display = '';
-  }
-}
-function renderBenchmark(data) {
-  document.getElementById('bm-loading').style.display = 'none';
-  const s = data.summary;
-  document.getElementById('bm-tra-struct').textContent = pct(s.structured_tra);
-  document.getElementById('bm-tra-delta').textContent = '+' + s.improvement_tra_pct.toFixed(0) + '% vs Basic';
-  document.getElementById('bm-acs-struct').textContent = pct(s.structured_acs);
-  document.getElementById('bm-acs-delta').textContent = '+' + s.improvement_acs_pct.toFixed(0) + '% vs Basic';
-  document.getElementById('bm-cyc-struct').textContent = pct(s.structured_cyc);
-  document.getElementById('bm-cyc-delta').textContent = '+' + s.improvement_cyc_pct.toFixed(0) + '% vs Basic';
-  document.getElementById('bm-generated-at').textContent = 'Generated: ' + new Date(data.generated_at).toLocaleString();
+      // ── Benchmark tab ──────────────────────────────────────────────────────
+      async function loadBenchmarkResults() {
+        document.getElementById('bm-loading').style.display = '';
+        document.getElementById('bm-content').style.display = 'none';
+        document.getElementById('bm-error').style.display = 'none';
+        try {
+          const data = await apiFetch('/api/benchmark/results');
+          renderBenchmark(data);
+        } catch (e) {
+          document.getElementById('bm-loading').style.display = 'none';
+          showError(
+            'bm-error',
+            'No benchmark results yet. Click Re-run to generate them.'
+          );
+          document.getElementById('bm-content').style.display = '';
+        }
+      }
+      function renderBenchmark(data) {
+        document.getElementById('bm-loading').style.display = 'none';
+        const s = data.summary;
+        document.getElementById('bm-tra-struct').textContent = pct(
+          s.structured_tra
+        );
+        document.getElementById('bm-tra-delta').textContent =
+          '+' + s.improvement_tra_pct.toFixed(0) + '% vs Basic';
+        document.getElementById('bm-acs-struct').textContent = pct(
+          s.structured_acs
+        );
+        document.getElementById('bm-acs-delta').textContent =
+          '+' + s.improvement_acs_pct.toFixed(0) + '% vs Basic';
+        document.getElementById('bm-cyc-struct').textContent = pct(
+          s.structured_cyc
+        );
+        document.getElementById('bm-cyc-delta').textContent =
+          '+' + s.improvement_cyc_pct.toFixed(0) + '% vs Basic';
+        document.getElementById('bm-generated-at').textContent =
+          'Generated: ' + new Date(data.generated_at).toLocaleString();
 
-  if (_bmChart) _bmChart.destroy();
-  const ctx = document.getElementById('bm-chart').getContext('2d');
-  _bmChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Table Retrieval', 'Answer Correctness', 'Cross-Year Coherence'],
-      datasets: [
-        { label: 'Basic Mode', data: [s.naive_tra, s.naive_acs, s.naive_cyc].map(v => +(v*100).toFixed(1)), backgroundColor: 'rgba(154,163,189,.4)', borderColor: '#9aa3bd', borderWidth: 1, borderRadius: 4 },
-        { label: 'Smart Mode', data: [s.structured_tra, s.structured_acs, s.structured_cyc].map(v => +(v*100).toFixed(1)), backgroundColor: 'rgba(91,141,239,.5)', borderColor: '#5b8def', borderWidth: 1, borderRadius: 4 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: {
-        y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%', color: '#9aa3bd' }, grid: { color: '#2a2f42' } },
-        x: { ticks: { color: '#9aa3bd' }, grid: { display: false } }
-      },
-      plugins: { legend: { labels: { color: '#e7eaf3', font: { size: 12 } } } }
-    }
-  });
+        if (_bmChart) _bmChart.destroy();
+        const ctx = document.getElementById('bm-chart').getContext('2d');
+        _bmChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: [
+              'Table Retrieval',
+              'Answer Correctness',
+              'Cross-Year Coherence',
+            ],
+            datasets: [
+              {
+                label: 'Basic Mode',
+                data: [s.naive_tra, s.naive_acs, s.naive_cyc].map(
+                  (v) => +(v * 100).toFixed(1)
+                ),
+                backgroundColor: 'rgba(154,163,189,.4)',
+                borderColor: '#9aa3bd',
+                borderWidth: 1,
+                borderRadius: 4,
+              },
+              {
+                label: 'Smart Mode',
+                data: [
+                  s.structured_tra,
+                  s.structured_acs,
+                  s.structured_cyc,
+                ].map((v) => +(v * 100).toFixed(1)),
+                backgroundColor: 'rgba(91,141,239,.5)',
+                borderColor: '#5b8def',
+                borderWidth: 1,
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { callback: (v) => v + '%', color: '#9aa3bd' },
+                grid: { color: '#2a2f42' },
+              },
+              x: { ticks: { color: '#9aa3bd' }, grid: { display: false } },
+            },
+            plugins: {
+              legend: { labels: { color: '#e7eaf3', font: { size: 12 } } },
+            },
+          },
+        });
 
-  const tbody = document.getElementById('bm-table-body');
-  tbody.innerHTML = data.results.map((r,i) => `
+        const tbody = document.getElementById('bm-table-body');
+        tbody.innerHTML = data.results
+          .map(
+            (r, i) => `
     <tr>
-      <td class="muted">${i+1}</td>
+      <td class="muted">${i + 1}</td>
       <td style="max-width:280px">${escHtml(r.question)}</td>
-      <td><span class="q-type">${r.type.replace(/_/g,' ')}</span></td>
+      <td><span class="q-type">${r.type.replace(/_/g, ' ')}</span></td>
       <td class="${r.naive.tra ? 'tra-yes' : 'tra-no'}">${r.naive.tra ? '✓' : '✗'}</td>
       <td class="${r.structured.tra ? 'tra-yes' : 'tra-no'}">${r.structured.tra ? '✓' : '✗'}</td>
       <td>${r.naive.acs != null ? pct(r.naive.acs) : '—'}</td>
       <td>${r.structured.acs != null ? pct(r.structured.acs) : '—'}</td>
       <td class="muted">${r.naive.latency_ms.toFixed(0)}</td>
       <td class="muted">${r.structured.latency_ms.toFixed(0)}</td>
-    </tr>`).join('');
+    </tr>`
+          )
+          .join('');
 
-  document.getElementById('bm-content').style.display = '';
-}
+        document.getElementById('bm-content').style.display = '';
+      }
 
-async function triggerBenchmark() {
-  const el = document.getElementById('bm-job-status');
-  el.innerHTML = '<span class="spinner"></span> Queued…';
-  try {
-    const res = await apiFetch('/api/benchmark/run', { method: 'POST' });
-    pollJob(res.job_id, el, () => loadBenchmarkResults());
-  } catch(e) { el.textContent = 'Error: ' + e.message; }
-}
+      async function triggerBenchmark() {
+        const el = document.getElementById('bm-job-status');
+        el.innerHTML = '<span class="spinner"></span> Queued…';
+        try {
+          const res = await apiFetch('/api/benchmark/run', { method: 'POST' });
+          pollJob(res.job_id, el, () => loadBenchmarkResults());
+        } catch (e) {
+          el.textContent = 'Error: ' + e.message;
+        }
+      }
 
-// ── Pipeline tab ───────────────────────────────────────────────────────
-async function loadPipelineStatus() {
-  try {
-    const data = await apiFetch('/api/pipeline/data-status');
-    renderPipelineStatus(data);
-  } catch(e) {
-    document.getElementById('pl-grid').innerHTML = `<div class="err">${e.message}</div>`;
-  }
-}
-function renderPipelineStatus(data) {
-  const tickers = [...new Set([...Object.keys(data.downloaded), ...Object.keys(data.parsed)])];
-  const years = [2021, 2022, 2023, 2024];
-  const grid = document.getElementById('pl-grid');
-  if (!tickers.length) { grid.innerHTML = '<div class="muted small">No filings indexed yet. Run pipeline stages below.</div>'; return; }
-  grid.innerHTML = tickers.map(t => {
-    const dl = data.downloaded[t] || []; const ps = data.parsed[t] || [];
-    return `<div class="pl-card">
+      // ── Pipeline tab ───────────────────────────────────────────────────────
+      async function loadPipelineStatus() {
+        try {
+          const data = await apiFetch('/api/pipeline/data-status');
+          renderPipelineStatus(data);
+        } catch (e) {
+          document.getElementById('pl-grid').innerHTML =
+            `<div class="err">${e.message}</div>`;
+        }
+      }
+      function renderPipelineStatus(data) {
+        const tickers = [
+          ...new Set([
+            ...Object.keys(data.downloaded),
+            ...Object.keys(data.parsed),
+          ]),
+        ];
+        const years = [2021, 2022, 2023, 2024];
+        const grid = document.getElementById('pl-grid');
+        if (!tickers.length) {
+          grid.innerHTML =
+            '<div class="muted small">No filings indexed yet. Run pipeline stages below.</div>';
+          return;
+        }
+        grid.innerHTML = tickers
+          .map((t) => {
+            const dl = data.downloaded[t] || [];
+            const ps = data.parsed[t] || [];
+            return `<div class="pl-card">
       <div class="pl-stk">${t}</div>
       <div class="pl-yrs">
-        ${years.map(y => {
-          const isParsed = ps.includes(y); const isDl = dl.includes(y);
-          const cls = isParsed ? 'green' : isDl ? 'yellow' : 'gray';
-          const title = isParsed ? 'parsed' : isDl ? 'downloaded' : 'missing';
-          return `<span class="yr-dot"><span class="dot ${cls}" title="${y}: ${title}"></span>${y}</span>`;
-        }).join('')}
+        ${years
+          .map((y) => {
+            const isParsed = ps.includes(y);
+            const isDl = dl.includes(y);
+            const cls = isParsed ? 'green' : isDl ? 'yellow' : 'gray';
+            const title = isParsed ? 'parsed' : isDl ? 'downloaded' : 'missing';
+            return `<span class="yr-dot"><span class="dot ${cls}" title="${y}: ${title}"></span>${y}</span>`;
+          })
+          .join('')}
       </div>
     </div>`;
-  }).join('');
-}
-async function triggerStage(stage) {
-  const el = document.getElementById('job-' + stage);
-  el.innerHTML = '<span class="spinner"></span> Queued…';
-  const paths = { download: '/api/pipeline/download', parse: '/api/pipeline/parse', 'build-index': '/api/pipeline/build-index' };
-  try {
-    const res = await apiFetch(paths[stage], { method:'POST', body: JSON.stringify({}) });
-    pollJob(res.job_id, el, () => loadPipelineStatus());
-  } catch(e) { el.textContent = 'Error: ' + e.message; }
-}
+          })
+          .join('');
+      }
+      async function triggerStage(stage) {
+        const el = document.getElementById('job-' + stage);
+        el.innerHTML = '<span class="spinner"></span> Queued…';
+        const paths = {
+          download: '/api/pipeline/download',
+          parse: '/api/pipeline/parse',
+          'build-index': '/api/pipeline/build-index',
+        };
+        try {
+          const res = await apiFetch(paths[stage], {
+            method: 'POST',
+            body: JSON.stringify({}),
+          });
+          pollJob(res.job_id, el, () => loadPipelineStatus());
+        } catch (e) {
+          el.textContent = 'Error: ' + e.message;
+        }
+      }
 
-// ── Helpers ────────────────────────────────────────────────────────────
-async function apiFetch(path, opts={}) {
-  const res = await fetch(API + path, { ...opts, headers: { 'Content-Type': 'application/json', ...(opts.headers||{}) } });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || res.statusText);
-  }
-  return res.json();
-}
-function pollJob(jobId, el, onDone, interval=3000) {
-  const t = setInterval(async () => {
-    try {
-      const s = await apiFetch('/api/pipeline/status/' + jobId);
-      el.innerHTML = s.stage === 'done' ? '✓ ' + s.message
-        : s.stage === 'error' ? '✗ ' + s.message
-        : `<span class="spinner"></span> ${s.stage}: ${s.message}`;
-      if (s.stage === 'done' || s.stage === 'error') { clearInterval(t); if (s.stage === 'done' && onDone) onDone(); }
-    } catch { clearInterval(t); }
-  }, interval);
-}
-function showError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.style.display = ''; }
-function pct(v) { return v != null ? (v*100).toFixed(0) + '%' : '—'; }
-function escHtml(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+      // ── Helpers ────────────────────────────────────────────────────────────
+      async function apiFetch(path, opts = {}) {
+        const res = await fetch(API + path, {
+          ...opts,
+          headers: {
+            'Content-Type': 'application/json',
+            ...(opts.headers || {}),
+          },
+        });
+        if (!res.ok) {
+          const err = await res
+            .json()
+            .catch(() => ({ detail: res.statusText }));
+          throw new Error(err.detail || res.statusText);
+        }
+        return res.json();
+      }
+      function pollJob(jobId, el, onDone, interval = 3000) {
+        const t = setInterval(async () => {
+          try {
+            const s = await apiFetch('/api/pipeline/status/' + jobId);
+            el.innerHTML =
+              s.stage === 'done'
+                ? '✓ ' + s.message
+                : s.stage === 'error'
+                  ? '✗ ' + s.message
+                  : `<span class="spinner"></span> ${s.stage}: ${s.message}`;
+            if (s.stage === 'done' || s.stage === 'error') {
+              clearInterval(t);
+              if (s.stage === 'done' && onDone) onDone();
+            }
+          } catch {
+            clearInterval(t);
+          }
+        }, interval);
+      }
+      function showError(id, msg) {
+        const el = document.getElementById(id);
+        el.textContent = msg;
+        el.style.display = '';
+      }
+      function pct(v) {
+        return v != null ? (v * 100).toFixed(0) + '%' : '—';
+      }
+      function escHtml(s) {
+        return String(s ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+      }
 
-// Auto-load benchmark on first visit (preloads chart even before tab switch)
-loadBenchmarkResults();
-</script>
-</body>
+      // Auto-load benchmark on first visit (preloads chart even before tab switch)
+      loadBenchmarkResults();
+    </script>
+  </body>
 </html>

@@ -19,7 +19,23 @@
       "Bash(npx shadcn@latest add button input card badge separator scroll-area sheet tooltip textarea --yes)",
       "Bash(npm install *)",
       "Bash(rm next.config.mjs)",
-      "Bash(rm tailwind.config.ts)"
+      "Bash(rm tailwind.config.ts)",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_click",
+      "mcp__plugin_playwright_playwright__browser_wait_for",
+      "mcp__plugin_playwright_playwright__browser_console_messages",
+      "mcp__plugin_playwright_playwright__browser_network_requests",
+      "mcp__plugin_playwright_playwright__browser_network_request",
+      "Bash(curl.exe *)",
+      "Bash(Resolve-DnsName sec-filing-analyzer.onrender.com)",
+      "Bash(nslookup sec-filing-analyzer.onrender.com)",
+      "Bash(vercel env *)",
+      "Bash(vercel link *)",
+      "Bash(del \"D:\\\\0001-Full Time\\\\Projects\\\\sec_analyzer\\\\.env.vercel.tmp\")",
+      "Bash(echo \"exit: $?\")",
+      "Bash(vercel --prod)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "Bash(vercel ls *)"
     ]
   }
 }
