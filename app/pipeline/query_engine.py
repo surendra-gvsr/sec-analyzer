@@ -98,26 +98,34 @@ def is_ready() -> bool:
 def _initialise_structured_fallback() -> bool:
     """Use the structured-chunk ChromaDB index when no graph exists."""
     global _query_engine, _index, _is_ready
+
+    # Import ONLY chromadb first — it's ~80MB. All other heavy imports
+    # (llama_index ~200MB, fastembed ~150MB) are deferred until after we
+    # confirm the collection exists. On a fresh Render deploy (no data),
+    # failing early keeps peak RSS under 350MB vs 600MB+, preventing OOM
+    # kills on the 512MB free tier before uvicorn can bind to its port.
     try:
         import chromadb
-        from llama_index.core import VectorStoreIndex, StorageContext, Settings as LISettings
-        from llama_index.embeddings.fastembed import FastEmbedEmbedding
-        from llama_index.llms.groq import Groq
-        from llama_index.vector_stores.chroma import ChromaVectorStore
     except ImportError as e:
-        log.error("Missing dependency: %s", e)
+        log.error("Missing chromadb: %s", e)
         return False
 
-    # Check collection exists BEFORE downloading the ONNX embedding model.
-    # On a fresh deploy (no persistent ChromaDB), failing early avoids a
-    # 90-second model download that blocks uvicorn's event loop and causes
-    # Render health checks to time out.
     chroma_client = chromadb.PersistentClient(path=settings.chroma_db_dir)
     try:
         collection = chroma_client.get_collection("structured_chunks")
     except Exception:
         log.warning("structured_chunks collection not found — run build_index.py --naive-only")
         _is_ready = False
+        return False
+
+    # Collection confirmed — now load the remaining heavy dependencies.
+    try:
+        from llama_index.core import VectorStoreIndex, StorageContext, Settings as LISettings
+        from llama_index.embeddings.fastembed import FastEmbedEmbedding
+        from llama_index.llms.groq import Groq
+        from llama_index.vector_stores.chroma import ChromaVectorStore
+    except ImportError as e:
+        log.error("Missing dependency: %s", e)
         return False
 
     llm = Groq(model=settings.groq_model, api_key=settings.groq_api_key)
