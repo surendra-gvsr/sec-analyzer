@@ -1,0 +1,29 @@
+# Python backend (Vercel only needs frontend/)
+venv/
+app/
+scripts/
+tests/
+requirements.txt
+Procfile
+render.yaml
+*.py
+__pycache__/
+*.pyc
+
+# Data files (not needed at build time)
+data/
+
+# Playwright test artifacts
+.playwright-mcp/
+
+# Screenshot files
+*.png
+*.jpg
+
+# Planning artifacts
+.planning/
+docs/
+
+# Frontend build cache (Vercel builds these)
+frontend/.next/
+frontend/node_modules/
