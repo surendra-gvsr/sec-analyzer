@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"D:\\\\0001-Full Time\\\\Projects\\\\sec_analyzer\" /b /a-d)",
+      "Read(//c/Users/gujju/my-project-ui/.claude/rules/**)",
+      "Read(//c/Users/gujju/my-project-ui/.claude/**)",
+      "Bash(cp -r \"C:/Users/gujju/my-project-ui/.claude\" \"D:/0001-Full Time/Projects/sec_analyzer/.claude\")",
+      "Bash(cp -r \"C:/Users/gujju/my-project-ui/.husky\" \"D:/0001-Full Time/Projects/sec_analyzer/.husky\")",
+      "Bash(cp \"C:/Users/gujju/my-project-ui/.prettierrc\" \"D:/0001-Full Time/Projects/sec_analyzer/.prettierrc\")",
+      "Bash(cp \"C:/Users/gujju/my-project-ui/.secretlintrc.json\" \"D:/0001-Full Time/Projects/sec_analyzer/.secretlintrc.json\")",
+      "Bash(graphify install *)",
+      "Bash(graphify claude *)",
+      "Bash(cp -r .claude/agents .)",
+      "Bash(cp -r .claude/commands .)",
+      "Bash(cp -r .claude/rules .)",
+      "Bash(cp .claude/settings.json .)",
+      "Bash(rm -rf .claude)",
+      "Bash(npx create-next-app@14 frontend --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\")",
+      "Bash(npx shadcn@latest add button input card badge separator scroll-area sheet tooltip textarea --yes)",
+      "Bash(npm install *)",
+      "Bash(rm next.config.mjs)",
+      "Bash(rm tailwind.config.ts)"
+    ]
+  }
+}

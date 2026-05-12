@@ -1,0 +1,90 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-12T02:16:04.700Z",
+  "source": "auto-postool",
+  "partial": false,
+  "phase": null,
+  "phase_name": null,
+  "phase_dir": null,
+  "plan": null,
+  "task": null,
+  "total_tasks": null,
+  "status": "auto-checkpoint",
+  "completed_tasks": [],
+  "remaining_tasks": [],
+  "blockers": [],
+  "human_actions_pending": [],
+  "decisions": [],
+  "uncommitted_files": [
+    {
+      "status": "??",
+      "path": ".claude/"
+    },
+    {
+      "status": "??",
+      "path": ".env.example"
+    },
+    {
+      "status": "??",
+      "path": ".gitignore"
+    },
+    {
+      "status": "??",
+      "path": ".husky/"
+    },
+    {
+      "status": "??",
+      "path": ".planning/"
+    },
+    {
+      "status": "??",
+      "path": ".prettierrc"
+    },
+    {
+      "status": "??",
+      "path": ".secretlintrc.json"
+    },
+    {
+      "status": "??",
+      "path": "CLAUDE.md"
+    },
+    {
+      "status": "??",
+      "path": "Procfile"
+    },
+    {
+      "status": "??",
+      "path": "app/"
+    },
+    {
+      "status": "??",
+      "path": "data/"
+    },
+    {
+      "status": "??",
+      "path": "docs/"
+    },
+    {
+      "status": "??",
+      "path": "frontend/"
+    },
+    {
+      "status": "??",
+      "path": "index.html"
+    },
+    {
+      "status": "??",
+      "path": "render.yaml"
+    },
+    {
+      "status": "??",
+      "path": "requirements.txt"
+    },
+    {
+      "status": "??",
+      "path": "scripts/"
+    }
+  ],
+  "next_action": null,
+  "context_notes": ""
+}
