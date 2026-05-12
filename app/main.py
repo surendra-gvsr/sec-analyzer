@@ -58,14 +58,19 @@ async def startup_event():
     import asyncio
     from app.pipeline import query_engine
     log.info("Starting SEC Analyzer…")
-    ok = await asyncio.to_thread(query_engine.initialise)
-    if ok:
-        log.info("GraphRAG index loaded successfully.")
-    else:
-        log.warning(
-            "Graph index not found — API will serve limited functionality until "
-            "POST /api/pipeline/build-index is called."
-        )
+    try:
+        ok = await asyncio.to_thread(query_engine.initialise)
+        if ok:
+            log.info("GraphRAG index loaded successfully.")
+        else:
+            log.warning(
+                "Index not available — API will return 503 for queries until "
+                "POST /api/pipeline/build-index is called."
+            )
+    except Exception as exc:
+        # Never let startup errors crash uvicorn — service must stay up to
+        # pass Render health checks and allow the user to trigger a rebuild.
+        log.error("Startup initialisation failed (non-fatal): %s", exc, exc_info=True)
 
 
 # ─── Frontend ─────────────────────────────────────────────────────────────────
