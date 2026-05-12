@@ -69,11 +69,21 @@ def _to_query_response(result, mode: str) -> QueryResponse:
 
 
 def query_filings(req: QueryRequest) -> QueryResponse:
+    if not query_engine.is_ready():
+        raise HTTPException(
+            status_code=503,
+            detail="Index not built yet. Go to the Pipeline tab and click 'Build Index' to get started.",
+        )
     result = query_engine.query(req.question, mode=req.mode)
     return _to_query_response(result, result.mode)
 
 
 def query_compare(req: QueryRequest) -> CompareResponse:
+    if not query_engine.is_ready():
+        raise HTTPException(
+            status_code=503,
+            detail="Index not built yet. Go to the Pipeline tab and click 'Build Index' to get started.",
+        )
     graph_result = query_engine.query(req.question, mode="graph")
     naive_result = query_engine.query(req.question, mode="naive")
     return CompareResponse(

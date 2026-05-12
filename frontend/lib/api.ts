@@ -18,7 +18,17 @@ function withTimeout(ms: number): AbortSignal {
   return AbortSignal.timeout(ms);
 }
 
-function humanizeError(e: unknown): Error {
+function humanizeError(
+  e: unknown,
+  responseStatus?: number,
+  responseText?: string
+): Error {
+  if (responseStatus === 503) {
+    const detail = responseText?.includes('Index not built')
+      ? 'Index not built yet — go to the Pipeline tab and click Build Index.'
+      : 'Backend is not ready — please try again in a moment.';
+    return new Error(detail);
+  }
   if (e instanceof DOMException && e.name === 'TimeoutError') {
     return new Error('Backend is starting up — please try again in a moment.');
   }
@@ -33,6 +43,8 @@ async function post<T>(
   body: unknown,
   timeoutMs = DEFAULT_TIMEOUT_MS
 ): Promise<T> {
+  let status: number | undefined;
+  let text: string | undefined;
   try {
     const res = await fetch(`${BASE}${path}`, {
       method: 'POST',
@@ -41,12 +53,13 @@ async function post<T>(
       signal: withTimeout(timeoutMs),
     });
     if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`${res.status}: ${text}`);
+      status = res.status;
+      text = await res.text();
+      throw new Error(`${status}: ${text}`);
     }
     return res.json() as Promise<T>;
   } catch (e) {
-    throw humanizeError(e);
+    throw humanizeError(e, status, text);
   }
 }
 
@@ -54,18 +67,21 @@ async function get<T>(
   path: string,
   timeoutMs = DEFAULT_TIMEOUT_MS
 ): Promise<T> {
+  let status: number | undefined;
+  let text: string | undefined;
   try {
     const res = await fetch(`${BASE}${path}`, {
       cache: 'no-store',
       signal: withTimeout(timeoutMs),
     });
     if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`${res.status}: ${text}`);
+      status = res.status;
+      text = await res.text();
+      throw new Error(`${status}: ${text}`);
     }
     return res.json() as Promise<T>;
   } catch (e) {
-    throw humanizeError(e);
+    throw humanizeError(e, status, text);
   }
 }
 
