@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { QueryInput } from '@/components/ask/QueryInput';
 import { ExampleCards } from '@/components/ask/ExampleCards';
@@ -22,6 +22,11 @@ export default function AskPage() {
   const [submitCount, setSubmitCount] = useState(0);
 
   const { history, push, clear } = useQueryHistory();
+
+  // Ping the backend on mount so Render warms up before the user submits.
+  useEffect(() => {
+    api.dataStatus().catch(() => {});
+  }, []);
 
   const handleSubmit = async () => {
     if (!question.trim()) return;

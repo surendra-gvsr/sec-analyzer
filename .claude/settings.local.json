@@ -35,7 +35,24 @@
       "Bash(echo \"exit: $?\")",
       "Bash(vercel --prod)",
       "mcp__plugin_playwright_playwright__browser_navigate",
-      "Bash(vercel ls *)"
+      "Bash(vercel ls *)",
+      "mcp__plugin_playwright_playwright__browser_resize",
+      "Bash(render --version)",
+      "Bash(python -c \"import chromadb; print\\('chromadb ok:', chromadb.__version__\\); c = chromadb.PersistentClient\\(path='data/chroma_db_test'\\); print\\('client ok'\\); c.list_collections\\(\\); print\\('list ok'\\)\")",
+      "Bash(rmdir /s /q \"data/chroma_db_test\")",
+      "Bash(venv/Scripts/python -c \"import chromadb; print\\('chromadb ok:', chromadb.__version__\\); c = chromadb.PersistentClient\\(path='data/chroma_db_test'\\); print\\('client ok'\\); colls = c.list_collections\\(\\); print\\('list ok, collections:', len\\(colls\\)\\)\")",
+      "Bash(venv/Scripts/pip install *)",
+      "Bash(venv/Scripts/python scripts/build_index.py --naive-only --force)",
+      "Bash(venv/Scripts/python -c \"from pinecone import Pinecone; print\\('pinecone ok'\\); from llama_index.vector_stores.pinecone import PineconeVectorStore; print\\('vectorstore ok'\\)\")",
+      "Bash(rm -f *.png)",
+      "Bash(ls *.png)",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "Bash(gh run *)",
+      "Bash(npx vercel *)",
+      "Bash(gh api *)",
+      "Bash(pip show *)",
+      "Bash(python *)"
     ]
   }
 }

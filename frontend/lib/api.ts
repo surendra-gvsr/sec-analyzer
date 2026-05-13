@@ -7,11 +7,13 @@ import type {
   QueryMode,
 } from './types';
 
-const BASE = 'https://sec-analyzer-t2hx.onrender.com';
+// Relative BASE routes through the Vercel proxy rewrite (vercel.json).
+// The proxy keeps connections open — no short edge timeout observed in practice.
+// Direct browser→Render is blocked by Cloudflare WAF (OPTIONS preflight fails).
+const BASE = '';
 
-// Query endpoint can take up to 90s (cold start + RAG pipeline).
-// Status/data endpoints should respond quickly once the service is up.
-const QUERY_TIMEOUT_MS = 120_000;
+// Render free tier cold start + RAG pipeline can take up to 3 min on first hit.
+const QUERY_TIMEOUT_MS = 240_000;
 const DEFAULT_TIMEOUT_MS = 30_000;
 
 function withTimeout(ms: number): AbortSignal {

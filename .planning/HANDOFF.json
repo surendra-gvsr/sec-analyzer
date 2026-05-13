@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-12T19:21:13.886Z",
+  "timestamp": "2026-05-13T21:07:43.925Z",
   "source": "auto-postool",
   "partial": false,
   "phase": null,
@@ -25,58 +25,26 @@
       "path": ".planning/HANDOFF.json"
     },
     {
-      "status": "D",
-      "path": ".vercelignore"
+      "status": "M",
+      "path": "CLAUDE.md"
     },
     {
       "status": "M",
-      "path": "index.html"
+      "path": "app/main.py"
     },
     {
       "status": "M",
-      "path": "vercel.json"
+      "path": "data/benchmark_results.json"
     },
     {
-      "status": "??",
-      "path": ".playwright-mcp/"
+      "status": "M",
+      "path": "frontend/app/ask/page.tsx"
     },
     {
-      "status": "??",
-      "path": "filingsiq-after-example-click.png"
-    },
-    {
-      "status": "??",
-      "path": "filingsiq-answer-2.png"
-    },
-    {
-      "status": "??",
-      "path": "filingsiq-answer-3.png"
-    },
-    {
-      "status": "??",
-      "path": "filingsiq-answer.png"
-    },
-    {
-      "status": "??",
-      "path": "filingsiq-ask-tab.png"
-    },
-    {
-      "status": "??",
-      "path": "filingsiq-benchmark-2.png"
-    },
-    {
-      "status": "??",
-      "path": "filingsiq-benchmark.png"
-    },
-    {
-      "status": "??",
-      "path": "filingsiq-query-response.png"
-    },
-    {
-      "status": "??",
-      "path": "vercel-deployment-inspect.png"
+      "status": "M",
+      "path": "frontend/lib/api.ts"
     }
   ],
   "next_action": null,
-  "context_notes": "Recent commits:\nb41be8f chore: add .vercelignore to exclude Python venv and data from Vercel upload\nc4d44dd fix: resolve Render cold-start crash-loop and proxy routing\nbabbdee chore: Vercel project linked, .vercel config added\nf3e46bf feat: track frontend as regular directory (fix submodule)\n03bf4f0 feat: add Next.js 14 frontend + tooling setup"
+  "context_notes": "Recent commits:\nd512e42 fix: add explicit CORS fallback middleware to handle OPTIONS preflight for direct browser calls\na80b88c fix: hardcode Render URL directly — remove env var dependency to fix Vercel proxy routing\n0e1c515 fix: use || instead of ?? so empty-string NEXT_PUBLIC_API_URL falls through to Render URL\n0d2914d fix: hardcode Render URL as fallback in api.ts\n6e86156 fix: call Render backend directly to bypass Vercel proxy timeout"
 }

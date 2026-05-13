@@ -21,10 +21,14 @@ Two services, both live:
 | Frontend | Vercel (Next.js)           | https://filingsiq.vercel.app           |
 | Backend  | Render free tier (FastAPI) | https://sec-analyzer-t2hx.onrender.com |
 
-**Important — Vercel proxy timeout issue:**
-`vercel.json` has a rewrite rule that proxies `/api/*` to Render. Vercel's proxy has a ~30s timeout but Render cold start + RAG pipeline takes 60-90s → `ERR_ABORTED`.
+**Request routing — Vercel proxy:**
+`vercel.json` rewrites `/api/*` to Render. `BASE = ''` in `frontend/lib/api.ts` keeps all API calls as relative URLs so they route through this proxy. The proxy keeps connections open with no short timeout observed in practice.
 
-**Fix (not yet applied):** Set `NEXT_PUBLIC_API_URL=https://sec-analyzer-t2hx.onrender.com` in Vercel dashboard (Settings → Environment Variables) OR commit `frontend/.env.production` with that value. The browser will then call Render directly using the 120s client-side timeout in `frontend/lib/api.ts`, bypassing the proxy entirely.
+**Do NOT attempt direct browser → Render calls.** Cloudflare WAF sits in front of Render and blocks cross-origin OPTIONS preflight (`net::ERR_FAILED`), making CORS impossible without Cloudflare configuration access we don't have.
+
+**Cold start latency:** Render free tier spins down after inactivity. Cold start + RAG pipeline first query can take 2-3 minutes. The client timeout is set to 240s (`QUERY_TIMEOUT_MS`). The Ask page pings `/api/pipeline/data-status` on mount to start warming Render before the user submits a query.
+
+**Vercel deployment:** There is NO GitHub auto-deploy integration. To deploy frontend changes, run `npx vercel --prod` from the `frontend/` directory. Do NOT use the Vercel dashboard "Redeploy" button — it re-runs the old build without picking up git changes.
 
 **Vector store:** Pinecone Serverless (index name: `sec-filings`, AWS us-east-1). Two namespaces:
 
@@ -150,9 +154,10 @@ q06 was changed from "MSFT total operating expenses" (ambiguous, wrong ground tr
 
 Next.js app in `frontend/`. Three pages: **Ask** (`/ask`), **Benchmark** (`/benchmark`), **Pipeline** (`/pipeline`).
 
-- API calls are in `frontend/lib/api.ts`. Base URL comes from `NEXT_PUBLIC_API_URL` env var (empty = relative URLs via Vercel proxy).
-- Query timeout is 120s client-side (`QUERY_TIMEOUT_MS`).
-- **Currently broken in production** because Vercel's proxy times out at ~30s. Fix: set `NEXT_PUBLIC_API_URL` in Vercel dashboard or commit `frontend/.env.production`.
+- API calls are in `frontend/lib/api.ts`. `BASE = ''` so all calls are relative URLs proxied through Vercel → Render.
+- Query timeout is 240s client-side (`QUERY_TIMEOUT_MS`) to survive Render free-tier cold start.
+- Ask page pings `/api/pipeline/data-status` on mount to warm Render before the user types.
+- `app/main.py` has a `cors_fallback` HTTP middleware that handles OPTIONS preflights and adds `Access-Control-Allow-Origin: *` to all responses (needed if routing ever switches back to direct calls).
 
 ## Where to make common changes
 
