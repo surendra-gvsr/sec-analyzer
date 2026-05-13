@@ -1,0 +1,42 @@
+# Big / irrelevant directories
+venv/
+frontend/
+node_modules/
+.git/
+.github/
+.planning/
+.claude/
+.vercel/
+.next/
+tests/
+docs/
+
+# Python build artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local data not needed at runtime
+data/raw_filings/
+data/chroma_db/
+data/chroma_db_test/
+data/graph_store/
+*.db
+
+# Logs and dumps
+*.log
+*.png
+.playwright-mcp/
+
+# Local secrets — Fly injects via `fly secrets`
+.env
+.env.*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

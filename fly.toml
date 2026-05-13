@@ -1,0 +1,41 @@
+# Fly.io config for the FilingsIQ FastAPI backend.
+# Deploy with: fly deploy
+# Secrets (PINECONE_API_KEY, GROQ_API_KEY, LLAMA_CLOUD_API_KEY, SEC_USER_EMAIL)
+# must be set separately via `fly secrets set KEY=value`.
+
+app = "filingsiq-api"
+primary_region = "iad"   # Ashburn — same region as Pinecone us-east-1
+
+[build]
+
+[env]
+  ENVIRONMENT = "production"
+  GROQ_MODEL = "llama3-8b-8192"
+  TARGET_TICKERS = "AAPL,MSFT"
+  TARGET_YEARS = "2021,2022,2023,2024"
+  # Reranker (flashrank rank-T5-flan) stays enabled on Fly — the 1GB VM has
+  # headroom that Render's 512MB free tier didn't.
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  # Stop the VM when idle to save money; cold start is ~1-3s on Fly.
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 10
+    hard_limit = 20
+
+[[http_service.checks]]
+  grace_period = "180s"     # Allow time for Pinecone init on first boot
+  interval = "30s"
+  method = "GET"
+  timeout = "10s"
+  path = "/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"
