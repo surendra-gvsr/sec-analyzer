@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://sec-filing-analyzer.onrender.com/api/:path*"
+      "destination": "https://sec-analyzer-t2hx.onrender.com/api/:path*"
     }
   ]
 }
