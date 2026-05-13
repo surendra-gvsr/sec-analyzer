@@ -8,7 +8,7 @@ import type {
 } from './types';
 
 const BASE =
-  process.env.NEXT_PUBLIC_API_URL ?? 'https://sec-analyzer-t2hx.onrender.com';
+  process.env.NEXT_PUBLIC_API_URL || 'https://sec-analyzer-t2hx.onrender.com';
 
 // Query endpoint can take up to 90s (cold start + RAG pipeline).
 // Status/data endpoints should respond quickly once the service is up.
