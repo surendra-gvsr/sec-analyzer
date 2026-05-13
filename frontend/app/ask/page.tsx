@@ -8,6 +8,7 @@ import { AnswerCard } from '@/components/ask/AnswerCard';
 import { EvidenceAccordion } from '@/components/ask/EvidenceAccordion';
 import { LoadingStages } from '@/components/ask/LoadingStages';
 import { QueryHistory } from '@/components/ask/QueryHistory';
+import { WelcomeCard } from '@/components/ask/WelcomeCard';
 import { TrendCard } from '@/components/ask/TrendCard';
 import { useQueryHistory } from '@/hooks/useQueryHistory';
 import type { QueryMode, QueryResponse, CompareResponse } from '@/lib/types';
@@ -61,6 +62,7 @@ export default function AskPage() {
         </p>
       </div>
       <div className="space-y-5">
+        <WelcomeCard />
         <QueryInput
           value={question}
           onChange={setQuestion}

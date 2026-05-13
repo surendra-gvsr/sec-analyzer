@@ -1,3 +1,5 @@
+import type { BenchmarkSummary } from '@/lib/types';
+
 interface StatCardProps {
   label: string;
   structured: number;
@@ -28,10 +30,7 @@ function StatCard({ label, structured, naive }: StatCardProps) {
 }
 
 interface StatsGridProps {
-  summary: {
-    structured: { TRA: number; ACS: number; CYC: number };
-    naive: { TRA: number; ACS: number; CYC: number };
-  };
+  summary: BenchmarkSummary;
 }
 
 export function StatsGrid({ summary }: StatsGridProps) {
@@ -39,18 +38,18 @@ export function StatsGrid({ summary }: StatsGridProps) {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <StatCard
         label="Table Retrieval (TRA)"
-        structured={summary.structured.TRA}
-        naive={summary.naive.TRA}
+        structured={summary.structured_tra}
+        naive={summary.naive_tra}
       />
       <StatCard
         label="Answer Correctness (ACS)"
-        structured={summary.structured.ACS}
-        naive={summary.naive.ACS}
+        structured={summary.structured_acs}
+        naive={summary.naive_acs}
       />
       <StatCard
         label="Cross-Year Coherence (CYC)"
-        structured={summary.structured.CYC}
-        naive={summary.naive.CYC}
+        structured={summary.structured_cyc}
+        naive={summary.naive_cyc}
       />
     </div>
   );

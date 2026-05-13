@@ -391,7 +391,14 @@ def _get_production_components(rerank_top_n: int = 5):
         vector_store, storage_context=storage_context
     )
 
-    nodes = _fetch_all_nodes_from_pinecone(pinecone_index, namespace="structured")
+    # SKIP_BM25_FETCH=1 short-circuits the expensive Pinecone-node fetch when
+    # we know BM25 reconstruction is not viable (e.g. the v3 SDK fetch returns
+    # empty for serverless namespace pagination). Saves ~8s on every cold start.
+    if os.getenv("SKIP_BM25_FETCH", "0") == "1":
+        log.info("SKIP_BM25_FETCH=1 — skipping Pinecone all-nodes fetch; using vector-only retrieval.")
+        nodes = []
+    else:
+        nodes = _fetch_all_nodes_from_pinecone(pinecone_index, namespace="structured")
 
     # Phase 2 tuning: cast a wider net (top-40), let reranker pick top-10
     # Guard: if Pinecone namespace is empty or pagination failed, fall back to

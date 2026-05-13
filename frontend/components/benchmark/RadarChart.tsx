@@ -8,28 +8,28 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import type { BenchmarkResultResponse } from '@/lib/types';
+import type { BenchmarkSummary } from '@/lib/types';
 
 interface RadarChartCardProps {
-  summary: BenchmarkResultResponse['summary'];
+  summary: BenchmarkSummary;
 }
 
 export function RadarChartCard({ summary }: RadarChartCardProps) {
   const data = [
     {
       metric: 'TRA',
-      structured: Math.round(summary.structured.TRA * 100),
-      naive: Math.round(summary.naive.TRA * 100),
+      structured: Math.round(summary.structured_tra * 100),
+      naive: Math.round(summary.naive_tra * 100),
     },
     {
       metric: 'ACS',
-      structured: Math.round(summary.structured.ACS * 100),
-      naive: Math.round(summary.naive.ACS * 100),
+      structured: Math.round(summary.structured_acs * 100),
+      naive: Math.round(summary.naive_acs * 100),
     },
     {
       metric: 'CYC',
-      structured: Math.round(summary.structured.CYC * 100),
-      naive: Math.round(summary.naive.CYC * 100),
+      structured: Math.round(summary.structured_cyc * 100),
+      naive: Math.round(summary.naive_cyc * 100),
     },
   ];
   return (

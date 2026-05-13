@@ -15,6 +15,10 @@ primary_region = "iad"   # Ashburn — same region as Pinecone us-east-1
   GROQ_MODEL = "llama-3.1-8b-instant"
   TARGET_TICKERS = "AAPL,MSFT"
   TARGET_YEARS = "2021,2022,2023,2024"
+  # Pinecone serverless v3 SDK fetch() returns 0 vectors for the namespace
+  # paginated by list(), so BM25 reconstruction always falls back to empty.
+  # Skip the 8s wasted fetch on every cold start until the SDK bug is fixed.
+  SKIP_BM25_FETCH = "1"
   # Reranker (flashrank rank-T5-flan) stays enabled on Fly — the 2GB VM has
   # headroom that Render's 512MB free tier didn't. 1GB was insufficient: the
   # process peaked at ~854MB RSS during rerank and was OOM-killed.
@@ -22,10 +26,11 @@ primary_region = "iad"   # Ashburn — same region as Pinecone us-east-1
 [http_service]
   internal_port = 8000
   force_https = true
-  # Stop the VM when idle to save money; cold start is ~1-3s on Fly.
+  # Keep one machine warm so users never hit a cold-boot delay. The second
+  # machine still auto-stops when idle (HA on demand, low idle cost).
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
 
   [http_service.concurrency]
     type = "requests"

@@ -43,29 +43,46 @@ export interface DataStatusResponse {
   index_stats: Record<string, unknown>;
 }
 
+export interface BenchmarkRunMetrics {
+  answer: string;
+  tra: number;          // 0 or 1
+  acs: number | null;
+  cyc: number | null;
+  latency_ms: number;
+  retrieved_chunks: number;
+  table_in_context: boolean;
+}
+
 export interface BenchmarkResult {
   question_id: string;
   question: string;
-  question_type: string;
-  expected: unknown;
-  graph_answer?: string;
-  naive_answer?: string;
-  tra_graph: boolean;
-  tra_naive: boolean;
-  acs_graph?: number;
-  acs_naive?: number;
-  cyc_graph?: boolean;
-  cyc_naive?: boolean;
-  confidence?: number;
+  type: string;
+  ticker: string;
+  years: number[];
+  expected_value: string | null;
+  naive: BenchmarkRunMetrics;
+  structured: BenchmarkRunMetrics;
+}
+
+export interface BenchmarkSummary {
+  naive_tra: number;
+  structured_tra: number;
+  naive_acs: number;
+  structured_acs: number;
+  naive_cyc: number;
+  structured_cyc: number;
+  naive_avg_latency_ms: number;
+  structured_avg_latency_ms: number;
+  improvement_tra_pct: number;
+  improvement_acs_pct: number;
+  improvement_cyc_pct: number;
+  total_questions: number;
 }
 
 export interface BenchmarkResultResponse {
   generated_at: string;
   total_questions: number;
-  summary: {
-    structured: { TRA: number; ACS: number; CYC: number };
-    naive: { TRA: number; ACS: number; CYC: number };
-  };
+  summary: BenchmarkSummary;
   results: BenchmarkResult[];
 }
 
