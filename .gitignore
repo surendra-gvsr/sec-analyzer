@@ -19,4 +19,15 @@ frontend/.env.local
 .DS_Store
 Thumbs.db
 
+# Screenshot artifacts from manual testing sessions
+*.png
+*.jpg
+*.jpeg
+
+# Playwright MCP session files
+.playwright-mcp/
+
+# Test ChromaDB instances
+data/chroma_db_test/
+
 .vercel
