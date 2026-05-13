@@ -499,35 +499,32 @@ def compute_gross_margin_from_nodes(nodes, year: Optional[int] = None) -> Option
     """
     Deterministic gross margin % resolver — verbatim extraction only.
 
-    Scans retrieved chunks for an explicit "gross margin ... XX.X%" statement
-    (e.g. Apple's MD&A typically states "Total gross margin percentage was
-    43.3%"). If a chunk shows the percent directly with a value in the
-    sane 15–80% range, return it. Otherwise return None and let the caller
-    fall back to the LLM.
+    Two-pass approach:
+      Pass 1 — look for "total gross margin percentage was/is X%" (MD&A phrasing).
+               These are the most reliable because they name the consolidated figure.
+      Pass 2 — broader "gross margin ... X%" scan across all nodes, collecting ALL
+               matches and preferring those where the target year appears nearby.
+               Avoids the multi-year-table trap where the first match is a prior-year
+               column (e.g. 2020's 38.2% or 2021's 41.8% picked instead of 2022's 43.3%).
 
-    A previous version attempted to compute the ratio from Net sales and
-    Cost of sales when the % wasn't stated. That approach was dropped: a
-    non-canonical chunk (segment breakdown, MD&A discussion of a sub-metric)
-    can contain numbers that reconcile arithmetically without representing
-    the actual consolidated gross margin. Compute-then-verify produced
-    wrong-with-confidence results on q07 (extracted COS=239,250 instead of
-    223,546). Verbatim-only is honest.
+    Returns None when no value in the 15–80% sanity range is found; caller falls back to LLM.
     """
-    direct_re = _re.compile(
-        r"gross\s+margin[^\n]{0,80}?(\d{1,2}(?:\.\d+)?)\s*%", _re.I
+    # Pass 1: precise MD&A phrasing — highest confidence
+    specific_re = _re.compile(
+        r"(?:total\s+)?gross\s+margin\s+percentage\s+(?:was|is|of|:)\s+(\d{2}(?:\.\d+)?)\s*%",
+        _re.I,
     )
     for n in nodes:
         text = getattr(n, "get_content", lambda: getattr(n, "text", ""))()
         if not text:
             continue
-        m = direct_re.search(text)
+        m = specific_re.search(text)
         if not m:
             continue
         try:
             pct = float(m.group(1))
         except ValueError:
             continue
-        # Sanity range — tech-company gross margin is typically 15–80%
         if 15 <= pct <= 80:
             return {
                 "value": pct,
@@ -535,11 +532,53 @@ def compute_gross_margin_from_nodes(nodes, year: Optional[int] = None) -> Option
                 "year": year,
                 "source": f"Stated verbatim: {m.group(0).strip()}",
                 "prose_answer": (
-                    f"Gross margin percentage was {pct}% as stated "
-                    f"directly in the filing."
+                    f"Gross margin percentage was {pct}% as stated directly in the filing."
                 ),
             }
-    return None
+
+    # Pass 2: broader scan — collect all candidates, prefer year-qualified matches
+    broad_re = _re.compile(
+        r"gross\s+margin[^\n]{0,80}?(\d{1,2}(?:\.\d+)?)\s*%", _re.I
+    )
+    candidates: List[tuple] = []  # (pct, has_year_nearby, match_text)
+    for n in nodes:
+        text = getattr(n, "get_content", lambda: getattr(n, "text", ""))()
+        if not text:
+            continue
+        for m in broad_re.finditer(text):
+            try:
+                pct = float(m.group(1))
+            except ValueError:
+                continue
+            if not (15 <= pct <= 80):
+                continue
+            # Check if target year appears within 300 chars of this match
+            has_year_nearby = False
+            if year:
+                window_start = max(0, m.start() - 300)
+                window_end = min(len(text), m.end() + 300)
+                has_year_nearby = str(year) in text[window_start:window_end]
+            candidates.append((pct, has_year_nearby, m.group(0).strip()))
+
+    if not candidates:
+        return None
+
+    # Pick year-qualified match first; among multiple, take the first found
+    year_matches = [(p, s) for p, hy, s in candidates if hy]
+    if year_matches:
+        pct, source = year_matches[0]
+    else:
+        pct, _, source = candidates[0]
+
+    return {
+        "value": pct,
+        "unit": "percent",
+        "year": year,
+        "source": f"Stated verbatim: {source}",
+        "prose_answer": (
+            f"Gross margin percentage was {pct}% as stated directly in the filing."
+        ),
+    }
 
 
 def boost_consolidated_chunks(nodes, question: str, boost_factor: float = 1.5):

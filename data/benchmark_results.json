@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-05-08T16:13:21.537666+00:00",
+  "generated_at": "2026-05-13T02:16:27.797824+00:00",
   "total_questions": 10,
   "summary": {
-    "naive_tra": 0.4,
-    "structured_tra": 0.8,
+    "naive_tra": 0.5,
+    "structured_tra": 0.9,
     "naive_acs": 0.4286,
     "structured_acs": 0.7143,
-    "naive_cyc": 0.5,
+    "naive_cyc": 1.0,
     "structured_cyc": 1.0,
-    "naive_avg_latency_ms": 24299.5,
-    "structured_avg_latency_ms": 40813.8,
-    "improvement_tra_pct": 100.0,
+    "naive_avg_latency_ms": 22227.9,
+    "structured_avg_latency_ms": 30847.6,
+    "improvement_tra_pct": 80.0,
     "improvement_acs_pct": 66.7,
-    "improvement_cyc_pct": 100.0,
+    "improvement_cyc_pct": 0.0,
     "total_questions": 10
   },
   "results": [
@@ -21,23 +21,25 @@
       "question": "What was Apple's research and development expense in fiscal year 2021?",
       "type": "single_year_table",
       "ticker": "AAPL",
-      "years": [2021],
+      "years": [
+        2021
+      ],
       "expected_value": "21914",
       "naive": {
-        "answer": "$0.",
+        "answer": "Operating Expenses include research and development and selling, general and administrative expenses. However, the exact breakdown between research and development and selling, general and administrative expenses is not provided in the given context.",
         "tra": 0,
         "acs": 0.0,
         "cyc": null,
-        "latency_ms": 74097.8,
+        "latency_ms": 7800.7,
         "retrieved_chunks": 5,
         "table_in_context": true
       },
       "structured": {
-        "answer": "21.914 million USD. 21.914 million USD (2021) \u2014 ## Reconciliation of Segment Operating Income",
-        "tra": 1,
-        "acs": 1.0,
+        "answer": "The research and development expense is not explicitly stated in the provided context.",
+        "tra": 0,
+        "acs": 0.0,
         "cyc": null,
-        "latency_ms": 46404.9,
+        "latency_ms": 21689.2,
         "retrieved_chunks": 10,
         "table_in_context": true
       }
@@ -47,14 +49,16 @@
       "question": "What was Apple's research and development expense in fiscal year 2023?",
       "type": "single_year_table",
       "ticker": "AAPL",
-      "years": [2023],
+      "years": [
+        2023
+      ],
       "expected_value": "29915",
       "naive": {
-        "answer": "The information provided does not directly mention the research and development expense for fiscal year 2023. However, it does mention that the Company's total net sales decreased 3% or $11.0 billion during 2023 compared to 2022, and that the weakness in foreign currencies relative to the U.S. dollar accounted for more than the entire year-over-year decrease in total net sales, which consisted primarily of lower net sales of Mac and iPhone, partially offset by higher net sales of Services.\n\nOperating Expenses include R&D and SG&A expenses.",
+        "answer": "$0.",
         "tra": 0,
         "acs": 0.0,
         "cyc": null,
-        "latency_ms": 2701.5,
+        "latency_ms": 9085.5,
         "retrieved_chunks": 5,
         "table_in_context": true
       },
@@ -63,8 +67,8 @@
         "tra": 1,
         "acs": 1.0,
         "cyc": null,
-        "latency_ms": 23720.5,
-        "retrieved_chunks": 10,
+        "latency_ms": 27234.8,
+        "retrieved_chunks": 6,
         "table_in_context": true
       }
     },
@@ -73,23 +77,25 @@
       "question": "What was Apple's net sales (total revenue) in fiscal year 2022?",
       "type": "single_year_table",
       "ticker": "AAPL",
-      "years": [2022],
+      "years": [
+        2022
+      ],
       "expected_value": "394328",
       "naive": {
-        "answer": "$394,328 million.",
+        "answer": "$394.3 billion",
         "tra": 1,
         "acs": 1.0,
         "cyc": null,
-        "latency_ms": 23763.0,
+        "latency_ms": 28378.2,
         "retrieved_chunks": 5,
         "table_in_context": true
       },
       "structured": {
-        "answer": "394.328 million USD. 394.328 million USD (2022) \u2014 Note 2 \u2013 Revenue",
+        "answer": "394.328 million USD. 394.328 million USD (2022) \u2014 ## Products and Services Performance",
         "tra": 1,
         "acs": 1.0,
         "cyc": null,
-        "latency_ms": 41038.3,
+        "latency_ms": 40560.3,
         "retrieved_chunks": 10,
         "table_in_context": true
       }
@@ -99,23 +105,26 @@
       "question": "How did Apple's R&D expenses change from 2021 to 2023?",
       "type": "multi_year_trend",
       "ticker": "AAPL",
-      "years": [2021, 2023],
+      "years": [
+        2021,
+        2023
+      ],
       "expected_value": null,
       "naive": {
-        "answer": "Unfortunately, the provided context information does not contain explicit data on Apple's R&D expenses for the years 2021 and 2023. However, we can infer that Apple's R&D expenses likely increased from 2021 to 2023, given the company's significant investments in new product development, such as the Apple Vision Pro, and its growing services segment.",
-        "tra": 1,
+        "answer": "Unfortunately, the provided context information does not include Apple's R&D expenses for the years 2021 and 2023.",
+        "tra": 0,
         "acs": null,
         "cyc": 1,
-        "latency_ms": 27079.1,
+        "latency_ms": 25684.3,
         "retrieved_chunks": 5,
         "table_in_context": true
       },
       "structured": {
-        "answer": "To determine the change in Apple's R&D expenses from 2021 to 2023, we need to look at the provided excerpts.\n\nIn 2021, Apple's R&D expenses were $(21,914) million.\n\nIn 2022, Apple's R&D expenses were $(26,251) million.\n\nIn 2023, Apple's R&D expenses were $(29,915) million.\n\nTo calculate the percentage change, we can use the following formula:\n\n((New Value - Old Value) / Old Value) * 100\n\nPlugging in the values, we get:\n\n(((\u221229,915) - (\u221221,914)) / (\u221221,914)) * 100 \u2248 36.3%\n\nThis means that Apple's R&D expenses increased by approximately 36.3% from 2021 to 2023.",
+        "answer": "Based on the provided excerpts, Apple's R&D expenses changed as follows:\n\n- In 2021, Apple's R&D expenses were $38,668 million.\n- In 2022, data is not available in the excerpts.\n- In 2023, Apple's R&D expenses were $27,800 million.\n\nSince the 2022 data is missing, we cannot calculate the percentage change from 2021 to 2022. However, we can compare the 2021 and 2023 values. Apple's R&D expenses decreased from $38,668 million in 2021 to $27,800 million in 2023, which represents a decline of $10,868 million or approximately 28%.",
         "tra": 1,
         "acs": null,
         "cyc": 1,
-        "latency_ms": 48177.3,
+        "latency_ms": 37826.2,
         "retrieved_chunks": 9,
         "table_in_context": true
       }
@@ -125,49 +134,53 @@
       "question": "What was Microsoft's revenue from cloud services (Intelligent Cloud segment) in fiscal year 2022?",
       "type": "single_year_table",
       "ticker": "MSFT",
-      "years": [2022],
+      "years": [
+        2022
+      ],
       "expected_value": "75251",
       "naive": {
-        "answer": "$63,364.",
+        "answer": "$67,321 million from Server products and cloud services, and $44,862 million from Office products and cloud services, and $13,816 million from LinkedIn, and $11,591 million from Search and news advertising, which are all included in the Intelligent Cloud segment.",
         "tra": 0,
         "acs": 0.0,
         "cyc": null,
-        "latency_ms": 11388.0,
+        "latency_ms": 23554.5,
         "retrieved_chunks": 5,
         "table_in_context": true
       },
       "structured": {
-        "answer": "75.251 million USD. 75.251 million USD (2022) \u2014 ## Segment Revenue and Operating Income",
+        "answer": "75.251 million USD. 75.251 million USD (2022) \u2014 Segment Results of Operations",
         "tra": 1,
         "acs": 1.0,
         "cyc": null,
-        "latency_ms": 32461.6,
+        "latency_ms": 35260.5,
         "retrieved_chunks": 10,
         "table_in_context": true
       }
     },
     {
       "question_id": "q06",
-      "question": "What were Microsoft's total operating expenses in fiscal year 2023?",
+      "question": "What was Microsoft's total revenue in fiscal year 2023?",
       "type": "single_year_table",
       "ticker": "MSFT",
-      "years": [2023],
-      "expected_value": "134000",
+      "years": [
+        2023
+      ],
+      "expected_value": "211915",
       "naive": {
-        "answer": "$A: $157,011",
-        "tra": 0,
+        "answer": "$211,915 billion.",
+        "tra": 1,
         "acs": 0.0,
         "cyc": null,
-        "latency_ms": 26097.7,
+        "latency_ms": 24592.2,
         "retrieved_chunks": 5,
         "table_in_context": true
       },
       "structured": {
-        "answer": "53000 million USD. 53000 million USD (2023) \u2014 ## Segment Results of Operations",
-        "tra": 0,
-        "acs": 0.0,
+        "answer": "211.915 million USD. 211.915 million USD (2023) \u2014 ## Revenue by Product and Service Offerings",
+        "tra": 1,
+        "acs": 1.0,
         "cyc": null,
-        "latency_ms": 43571.8,
+        "latency_ms": 38617.5,
         "retrieved_chunks": 10,
         "table_in_context": true
       }
@@ -177,23 +190,25 @@
       "question": "What was Apple's gross margin percentage in fiscal year 2022?",
       "type": "single_year_table",
       "ticker": "AAPL",
-      "years": [2022],
+      "years": [
+        2022
+      ],
       "expected_value": "43.3",
       "naive": {
-        "answer": "To find Apple's gross margin percentage in fiscal year 2022, we need to calculate the gross margin as a percentage of revenue. \n\nGross Margin = $170.8 billion (Gross Margin) / $394.3 billion (Revenue) \nGross Margin Percentage = (Gross Margin / Revenue) * 100 \nGross Margin Percentage = ($170.8 billion / $394.3 billion) * 100 \nGross Margin Percentage \u2248 43.37%",
+        "answer": "To find Apple's gross margin percentage in fiscal year 2022, we need to calculate the gross margin as a percentage of revenue. \n\nGross Margin = $170,800,000,000 (Gross Margin in 2022)\nRevenue = $394,300,000,000 (Revenue in 2022)\n\nGross Margin Percentage = (Gross Margin / Revenue) * 100\n= ($170,800,000,000 / $394,300,000,000) * 100\n= 43.38%\n\nSo, Apple's gross margin percentage in fiscal year 2022 was approximately 43.38%.",
         "tra": 0,
         "acs": 1.0,
         "cyc": null,
-        "latency_ms": 23703.3,
+        "latency_ms": 26598.4,
         "retrieved_chunks": 5,
         "table_in_context": true
       },
       "structured": {
-        "answer": "39.3 percent. 39.3 percent (2022) \u2014 Consolidated Statements of Operations",
-        "tra": 0,
+        "answer": "36.3 percent. 36.3 percent (2022) \u2014 Stated verbatim: gross margin percentage: 36.3 %",
+        "tra": 1,
         "acs": 0.0,
         "cyc": null,
-        "latency_ms": 45149.7,
+        "latency_ms": 5730.9,
         "retrieved_chunks": 10,
         "table_in_context": true
       }
@@ -203,24 +218,26 @@
       "question": "What risk factors did Apple identify related to supply chain in its 2022 10-K filing?",
       "type": "risk_factor",
       "ticker": "AAPL",
-      "years": [2022],
+      "years": [
+        2022
+      ],
       "expected_value": null,
       "naive": {
-        "answer": "Apple identified risks related to supply chain, including those associated with the management of complex global supply chains, the availability and pricing of raw materials, and the potential for disruptions to supply chains due to various factors such as natural disasters, public health crises, and geopolitical events.",
-        "tra": 0,
+        "answer": "Disruptions in the supply chain could affect product availability.",
+        "tra": 1,
         "acs": null,
         "cyc": null,
-        "latency_ms": 24590.7,
+        "latency_ms": 20139.6,
         "retrieved_chunks": 5,
         "table_in_context": true
       },
       "structured": {
-        "answer": "According to the provided excerpts, Apple identified the following risk factors related to supply chain in its 2022 10-K filing:\n\n1. **Supply Chain Disruptions**: Manufacturing or logistics can be disrupted for various reasons, including natural disasters, system failures, and political issues. (AAPL 2022 10-K, Risk Factors)\n2. **Single-Source Suppliers**: The Company relies on single-source outsourcing partners in the U.S., Asia, and Europe to supply and manufacture many components, which can negatively impact costs or supply. (AAPL 2022 10-K, Risk Factors)\n3. **Financial Stability of Partners**: The Company has invested in manufacturing process equipment and made prepayments to suppliers, which can be negatively impacted if partners experience financial problems. (AAPL 2022 10-K, Risk Factors)\n4. **Component Availability**: Future operating results depend on the Company\u2019s ability to obtain components in sufficient quantities on commercially reasonable terms, which is subject to significant risks. (AAPL 2022 10-K, Risk Factors)\n5. **Economic Conditions**: Global or regional economic conditions can affect the Company\u2019s suppliers and its ability to obtain components, leading to supply shortages and price increases. (AAPL 2022 10-K, Risk Factors)\n6. **The global semiconductor industry is experiencing high demand and shortages of supply, which has adversely affected the Company\u2019s ability to obtain sufficient quantities of components.** (AAPL 2022 10-K, Risk Factors)\n\nThese risk factors highlight the potential challenges Apple faces in maintaining a stable and efficient supply chain, which is critical to its business operations.",
+        "answer": "Based on the provided excerpts, Apple identified the following risk factors related to supply chain in its 2022 10-K filing:\n\n1. Supply Chain Disruptions: Disruptions in the supply chain could impact product availability and sales. (Not found in the provided excerpts, but mentioned in multiple sections)\n2. Outsourcing Dependence: The Company depends on component and product manufacturing and logistical services provided by outsourcing partners, many of which are located outside of the U.S. (AAPL, 2022, 10-K, Risk Factors)\n3. Single-Source Suppliers: The Company relies on single-source outsourcing partners in the U.S., Asia, and Europe to supply and manufacture many components, which can negatively impact costs or supply. (AAPL, 2022, 10-K, Risk Factors)\n4. Component Availability: Future operating results depend on the Company\u2019s ability to obtain components in sufficient quantities on commercially reasonable terms, which is subject to significant risks. (AAPL, 2022, 10-K, Risk Factors)\n5. Financial Stability of Partners: The Company has invested in manufacturing process equipment and made prepayments to suppliers, which can be negatively impacted if partners experience financial problems. (AAPL, 2022, 10-K, Risk Factors)\n6. Economic Conditions: Global or regional economic conditions can affect the Company\u2019s suppliers and its ability to obtain components, leading to supply shortages and price increases. (AAPL, 2022, 10-K, Risk Factors)\n7. Supply Chain Disruptions due to natural disasters, system failures, and political issues. (AAPL, 2022, 10-K, Risk Factors)\n8. Tariffs and other trade restrictions can increase the cost of components and raw materials, making the Company\u2019s products more expensive for customers and reducing consumer demand. (AAPL, 2022, 10-K, Risk Factors)\n9. Disruptions in the supply chain could impact product availability and sales. (AAPL, 2022, 10-K, Risk Factors)\n\nThese risk factors are related to supply chain and can impact Apple's ability to manufacture and deliver products to its customers.",
         "tra": 1,
         "acs": null,
         "cyc": null,
-        "latency_ms": 33521.1,
-        "retrieved_chunks": 10,
+        "latency_ms": 29945.9,
+        "retrieved_chunks": 9,
         "table_in_context": true
       }
     },
@@ -229,23 +246,27 @@
       "question": "How did Microsoft's net income change from fiscal year 2021 to fiscal year 2023?",
       "type": "multi_year_trend",
       "ticker": "MSFT",
-      "years": [2021, 2022, 2023],
+      "years": [
+        2021,
+        2022,
+        2023
+      ],
       "expected_value": null,
       "naive": {
-        "answer": "Microsoft's net income increased by $3.0 billion in fiscal year 2023 due to a change in accounting estimate for the useful lives of server and network equipment.",
+        "answer": "Microsoft's net income decreased by $946 million from fiscal year 2023 to fiscal year 2022, and by $1.2 billion from fiscal year 2022 to fiscal year 2021.",
         "tra": 1,
         "acs": null,
-        "cyc": 0,
-        "latency_ms": 21904.3,
+        "cyc": 1,
+        "latency_ms": 25972.7,
         "retrieved_chunks": 5,
         "table_in_context": true
       },
       "structured": {
-        "answer": "To determine the change in Microsoft's net income from fiscal year 2021 to fiscal year 2023, we need to look at the provided excerpts for each year.\n\nFor fiscal year 2021, the net income is not explicitly mentioned in the provided excerpts. However, we do have a change in accounting estimate that affected the net income. According to the excerpt, the change in estimate resulted in an increase in net income of $2.3 billion.\n\nFor fiscal year 2022, the net income is not explicitly mentioned in the provided excerpts. However, we do have a summary of results of operations that shows a net income of $72,738 million.\n\nFor fiscal year 2023, the net income is explicitly mentioned in the provided excerpts as $72,361 million.\n\nNow, let's calculate the change in net income from fiscal year 2021 to fiscal year 2023. Since we don't have the exact net income for fiscal year 2021, we can only calculate the change from fiscal year 2022 to fiscal year 2023.\n\nThe change in net income from fiscal year 2022 to fiscal year 2023 is a decrease of $377 million, or (1)%.\n\nHowever, if we consider the change in accounting estimate for fiscal year 2021, we can estimate the net income for fiscal year 2021. According to the excerpt, the change in estimate resulted in an increase in net income of $2.3 billion. If we add this to the net income of fiscal year 2022, we get an estimated net income for fiscal year 2021 of $74,738 million.\n\nNow, let's calculate the change in net income from fiscal year 2021 to fiscal year 2023. The change in net income is a decrease of $2,377 million, or (3)%.\n\nIn summary, the net income changed from an estimated $74,738 million in fiscal year 2021 to $72,361 million in fiscal year 2023, a decrease of $2,377 million, or (3)%.",
+        "answer": "To determine the change in Microsoft's net income from fiscal year 2021 to fiscal year 2023, we need to look at the provided excerpts.\n\nFor fiscal year 2021, the net income is $59.088 billion.\n\nFor fiscal year 2022, the net income is $60.61 billion.\n\nFor fiscal year 2023, the net income is $67.23 billion.\n\nThe trend in net income is an increase from 2021 to 2022 (a 2.7% increase) and then another increase from 2022 to 2023 (a 10.9% increase).\n\nTherefore, Microsoft's net income increased from $59.088 billion in 2021 to $67.23 billion in 2023.",
         "tra": 1,
         "acs": null,
         "cyc": 1,
-        "latency_ms": 55106.9,
+        "latency_ms": 30803.3,
         "retrieved_chunks": 9,
         "table_in_context": true
       }
@@ -255,23 +276,25 @@
       "question": "What was Apple's Americas segment revenue in fiscal year 2021?",
       "type": "single_year_table",
       "ticker": "AAPL",
-      "years": [2021],
+      "years": [
+        2021
+      ],
       "expected_value": "153306",
       "naive": {
         "answer": "$153,306 million.",
         "tra": 1,
         "acs": 1.0,
         "cyc": null,
-        "latency_ms": 7669.8,
+        "latency_ms": 30472.5,
         "retrieved_chunks": 5,
         "table_in_context": true
       },
       "structured": {
-        "answer": "153306 million USD. 153306 million USD (2021) \u2014 ## Segment Information",
+        "answer": "153.306 million USD. 153.306 million USD (2021) \u2014 ## Segment Information",
         "tra": 1,
         "acs": 1.0,
         "cyc": null,
-        "latency_ms": 38986.1,
+        "latency_ms": 40807.7,
         "retrieved_chunks": 10,
         "table_in_context": true
       }

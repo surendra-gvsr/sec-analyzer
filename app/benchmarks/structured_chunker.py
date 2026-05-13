@@ -393,13 +393,22 @@ def _get_production_components(rerank_top_n: int = 5):
     nodes = _fetch_all_nodes_from_pinecone(pinecone_index, namespace="structured")
 
     # Phase 2 tuning: cast a wider net (top-40), let reranker pick top-10
-    hybrid_retriever = build_hybrid_retriever(
-        vector_index=vector_index,
-        nodes=nodes,
-        similarity_top_k=40,
-        bm25_top_k=40,
-        fused_top_k=40,
-    )
+    # Guard: if Pinecone namespace is empty or pagination failed, fall back to
+    # vector-only retrieval so the pipeline doesn't crash with a BM25 error.
+    if nodes:
+        hybrid_retriever = build_hybrid_retriever(
+            vector_index=vector_index,
+            nodes=nodes,
+            similarity_top_k=40,
+            bm25_top_k=40,
+            fused_top_k=40,
+        )
+    else:
+        log.warning(
+            "No nodes returned from Pinecone 'structured' namespace — "
+            "falling back to vector-only retrieval. Run build_index.py to populate."
+        )
+        hybrid_retriever = vector_index.as_retriever(similarity_top_k=40)
 
     reranker = FastEmbedReranker(top_n=max(rerank_top_n, 10))
     hyde = HyDEGenerator(llm=llm)

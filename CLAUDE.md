@@ -18,7 +18,7 @@ cp .env.example .env   # then fill in LLAMA_CLOUD_API_KEY, GROQ_API_KEY, SEC_USE
 # Data pipeline (run once, in order)
 python scripts/download_filings.py            # ~5 min: SEC EDGAR direct HTTP
 python scripts/parse_filings.py               # ~30 min: LlamaParse cloud API (cached)
-python scripts/build_index.py --naive-only --force   # ~10 min: builds naive + structured ChromaDB
+python scripts/build_index.py --naive-only --force   # ~10 min: builds naive + structured into Pinecone (skips slow PropertyGraph)
 
 # Optional: full GraphRAG index (slow, mostly for completeness)
 python scripts/build_index.py --graph-only --force

@@ -74,13 +74,13 @@ BENCHMARK_QUESTIONS: List[Dict[str, Any]] = [
     },
     {
         "id": "q06",
-        "question": "What were Microsoft's total operating expenses in fiscal year 2023?",
+        "question": "What was Microsoft's total revenue in fiscal year 2023?",
         "type": "single_year_table",
         "ticker": "MSFT",
         "years": [2023],
-        "expected_value": "134000",   # approximate — exact value varies by definition
+        "expected_value": "211915",
         "expected_unit": "million",
-        "table_keyword": "operating",
+        "table_keyword": "revenue",
     },
     {
         "id": "q07",
