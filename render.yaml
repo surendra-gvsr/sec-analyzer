@@ -19,6 +19,8 @@ services:
         value: 'AAPL,MSFT'
       - key: TARGET_YEARS
         value: '2021,2022,2023,2024'
+      - key: DISABLE_RERANKER
+        value: '1'
       - key: LLAMA_CLOUD_API_KEY
         sync: false
       - key: GROQ_API_KEY

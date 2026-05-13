@@ -12,6 +12,7 @@ compared to naive fixed-size chunking.
 from __future__ import annotations
 
 import logging
+import os
 import re
 from typing import Dict, List, Optional, Tuple
 
@@ -410,12 +411,22 @@ def _get_production_components(rerank_top_n: int = 5):
         )
         hybrid_retriever = vector_index.as_retriever(similarity_top_k=40)
 
-    reranker = FastEmbedReranker(top_n=max(rerank_top_n, 10))
+    # On 512MB hosts (e.g. Render free tier) flashrank's rank-T5-flan (~150MB
+    # resident) blows the memory ceiling. Setting DISABLE_RERANKER=1 skips the
+    # reranker entirely; retrieval falls back to vector (or RRF when BM25 is
+    # populated) scores. Quality drops slightly; service stays alive.
+    if os.getenv("DISABLE_RERANKER", "0") == "1":
+        log.info("DISABLE_RERANKER=1 — skipping flashrank reranker (memory-constrained mode).")
+        reranker = None
+        postprocessors = []
+    else:
+        reranker = FastEmbedReranker(top_n=max(rerank_top_n, 10))
+        postprocessors = [reranker]
     hyde = HyDEGenerator(llm=llm)
 
     default_engine = RetrieverQueryEngine.from_args(
         retriever=hybrid_retriever,
-        node_postprocessors=[reranker],
+        node_postprocessors=postprocessors,
         llm=llm,
     )
 
@@ -531,7 +542,11 @@ def _retrieve_with_hyde(
     else:
         nodes = comps["hybrid_retriever"].retrieve(QueryBundle(query_str=retrieval_query))
 
-    reranked = comps["reranker"].postprocess_nodes(nodes, query_str=question)
+    if comps["reranker"] is not None:
+        reranked = comps["reranker"].postprocess_nodes(nodes, query_str=question)
+    else:
+        # DISABLE_RERANKER=1 — keep retrieval order (vector / RRF score).
+        reranked = nodes[: max(top_k, 10)]
     # Boost consolidated-statement chunks when the question asks for company-wide
     # totals (skipped if the question is segment-specific).
     reranked = boost_consolidated_chunks(reranked, question)
