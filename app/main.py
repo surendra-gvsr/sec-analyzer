@@ -89,6 +89,19 @@ async def startup_event():
         # Never let startup errors crash uvicorn — service must stay up to
         # pass Render health checks and allow the user to trigger a rebuild.
         log.error("Startup initialisation failed (non-fatal): %s", exc, exc_info=True)
+        return
+
+    # Pre-warm the production retriever (fastembed + Pinecone node fetch + BM25 +
+    # flashrank). On Render free tier the first query otherwise OOM-kills the
+    # worker mid-request; doing this work at boot (no edge timeout) makes the
+    # first user query a fast retrieval-only path.
+    if query_engine.is_ready():
+        try:
+            from app.benchmarks.structured_chunker import _get_production_components
+            await asyncio.to_thread(_get_production_components)
+            log.info("Production retriever pre-warmed.")
+        except Exception as exc:
+            log.warning("Pre-warm failed (non-fatal, will lazy-load on first query): %s", exc)
 
 
 # ─── Frontend ─────────────────────────────────────────────────────────────────
